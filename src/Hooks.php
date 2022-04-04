@@ -101,7 +101,7 @@ class Hooks {
 			return true;
 		}
 
-        if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
+		if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
 			return true;
 		}
 		if ( $wgBlockAllowsUTEdit && $title->equals( $user->getTalkPage() ) ) {
