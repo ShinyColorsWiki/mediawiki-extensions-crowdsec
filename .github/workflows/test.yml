@@ -1,0 +1,129 @@
+# Based on https://github.com/edwardspec/mediawiki-aws-s3/blob/master/.github/workflows/main.yml
+name: Test
+
+on: [push, pull_request, workflow_dispatch]
+
+env:
+  DBTYPE: mysql
+  DBUSER: root
+
+jobs:
+  # PHP linters: phpcs, parallel-lint, etc.
+  linter:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+            php-version: '7.4'
+            tools: composer:v1
+      - uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache
+          key: composer-cache
+      - run: sudo apt-get install -y composer && composer install
+      - run: composer test
+
+  # Phan (PHP static analyzer)
+  phan:
+    runs-on: ubuntu-20.04
+    env:
+      branch: REL1_35
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+            php-version: '7.4'
+            extensions: ast
+            tools: composer:v1
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer/cache
+            buildcache
+          key: buildcache-${{ env.branch }}
+      - uses: edwardspec/github-action-build-mediawiki@v1
+        with:
+          branch: ${{ env.branch }}
+          noinstall: 1
+      - name: Install dependencies
+        run: |
+          rsync -a --exclude buildcache --exclude mediawiki --exclude .git . mediawiki/extensions/CrowdSec/
+          cd mediawiki/extensions/CrowdSec
+          composer install
+      - name: RUN -- phan
+        run: cd mediawiki/extensions/CrowdSec && ./vendor/bin/phan --analyze-twice
+
+  # PHPUnit testsuite + Moto (mock server that emulates S3 API).
+  phpunit:
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.4]
+        branch: [REL1_35]
+        mockhttptrait: [false]
+        include: # Test will fail since 1.36. See https://phabricator.wikimedia.org/T265628
+          - php: 7.4
+            branch: REL1_36
+            mockhttptrait: true
+          - php: 7.4
+            branch: REL1_37
+            mockhttptrait: true
+    env:
+      USE_MOCK: 1
+      branch: ${{ matrix.branch }}
+    runs-on: ubuntu-20.04
+    services:
+      memcached:
+        image: memcached:latest
+        ports:
+          - 11211:11211
+        options: --health-cmd "timeout 5 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/11211'" --health-interval 10s --health-timeout 5s --health-retries 5
+      mariadb:
+        image: mariadb
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer/cache
+            buildcache
+          key: buildcache-${{ env.branch }}-${{ hashFiles('**/no/files/need/to/invalidate/cache/for/now') }}
+      - name: Install and run CrowdSec
+        run: |
+          curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh | sudo bash
+          sudo apt-get install crowdsec
+      - uses: shivammathur/setup-php@v2
+        with:
+            php-version: ${{ matrix.php }}
+            extensions: mbstring, intl, opcache, mysqli
+            tools: composer:v1
+      - name: (debug) Print "php -i"
+        run: php -i
+      - uses: edwardspec/github-action-build-mediawiki@v1
+        with:
+          branch: ${{ env.branch }}
+          extraLocalSettings: tests/ci/CSExtSettings.php
+      - name: Finalize the installation of MediaWiki
+        run: |
+          rsync -a --exclude buildcache --exclude mediawiki --exclude .git . mediawiki/extensions/CrowdSec/
+          cd mediawiki
+          cp extensions/CrowdSec/tests/travis/composer.local.json . && composer update
+          echo '{{CURRENTVERSION}}' | php maintenance/parse.php
+      - name: Setup CS Cli Test
+        run: |
+          sudo cscli bouncers add test -k TestKey1
+          sudo cscli decisions add --ip 127.0.0.1 --type ban
+          sudo cscli decisions add --ip 127.0.0.2 --type captcha
+          curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.1" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
+          curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.2" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
+      - name: RUN -- phpunit
+        continue-on-error: ${{ matrix.mockhttptrait }}
+        run: |
+          cd mediawiki
+          php tests/phpunit/phpunit.php extensions/CrowdSec/tests/phpunit/

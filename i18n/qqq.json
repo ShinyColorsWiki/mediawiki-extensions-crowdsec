@@ -1,0 +1,13 @@
+{
+	"@metadata": {
+		"authors": [
+			"MPThLee"
+		]
+	},
+	"abusefilter-edit-builder-vars-crowdsec-blocked": "Abuse filter syntax option in a dropdown from the group {{msg-mw|abusefilter-edit-builder-group-vars}}.",
+	"action-crowdsecblock-bypass": "{{doc-action|crowdsecblock-bypass}}",
+	"right-crowdsecblock-bypass": "{{doc-right|crowdsecblock-bypass}}",
+	"crowdsec-blocked": "Message a user sees when their IP address is denylisted and they cannot edit.\n\nParameters:\n* $1 - the user's current IP address",
+	"crowdsec-desc": "{{desc|name=CrowdSec|url=https://github.com/ShinyColorsWiki/mediawiki-extension-crowdsec}}",
+	"crowdsec-is-blocked": "Shown when going to block an IP address that is currently denylisted.\n\nParameters:\n* $1 - the IP address"
+}
