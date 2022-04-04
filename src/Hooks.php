@@ -93,14 +93,14 @@ class Hooks {
 	 * @return bool
 	 */
 	public static function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
-		global $wgCrowdSecReportOnly, $wgBlockAllowsUTEdit, $wgCrowdSecTreatCaptchaAsBan, 
-               $wgCrowdSecFallbackBan, $wgCrowdSecRestrictRead;
+		global $wgCrowdSecReportOnly, $wgBlockAllowsUTEdit, $wgCrowdSecTreatCaptchaAsBan,
+			   $wgCrowdSecFallbackBan, $wgCrowdSecRestrictRead;
 
 		if ( !self::isConfigOk() ) {
 			// Not configured
 			return true;
 		}
-		if ( $action === 'read' !$wgCrowdSecRestrictRead ) {
+		if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
 			return true;
 		}
 		if ( $wgBlockAllowsUTEdit && $title->equals( $user->getTalkPage() ) ) {
