@@ -9,7 +9,7 @@ This extension is does a job for [CrowdSec](https://crowdsec.net) bouncer for me
 ## Configuration 
 in `LocalSettings.php`
 ```php
-wfELoadxtension( 'CrowdSec' ); // Load Extension
+wfLoadExtension( 'CrowdSec' ); // Load Extension
 
 $wgCrowdSecEnable = true; // Set false to disable
 

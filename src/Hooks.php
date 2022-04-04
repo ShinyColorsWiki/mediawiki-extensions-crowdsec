@@ -100,7 +100,8 @@ class Hooks {
 			// Not configured
 			return true;
 		}
-		if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
+
+        if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
 			return true;
 		}
 		if ( $wgBlockAllowsUTEdit && $title->equals( $user->getTalkPage() ) ) {
@@ -207,7 +208,7 @@ class Hooks {
 	 * @return bool
 	 */
 	public static function onOtherBlockLogLink( &$msg, $ip ) {
-		if ( !$isConfigOk ) {
+		if ( !self::isConfigOk() ) {
 			return true;
 		}
 
