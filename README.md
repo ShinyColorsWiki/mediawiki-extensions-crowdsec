@@ -20,8 +20,10 @@ $wgCrowdSecCache = true; // Recommended to use this for perfomance.
 
 $wgCrowdSecFallbackBan = false; // If LAPI request failed, `true` will block all user. Not recommended to set `true`.
 $wgCrowdSecTreatCaptchaAsBan = false; // Use at your own risk. There's no challenge. Use with ConfirmEdit instead.
+$wgCrowdSecRestrictRead = false; // Use at your own risk. This will block the site at all who listed on CrowdSec
 
 $wgCrowdSecReportOnly = false; // This Doesn't block the user. for debug purpose.
+#$wgDebugLogGroups['CrowdSec'] = '/var/log/mediawiki/crowdsec.log'; // for debug purpose.
 ```
 
 ## Thanks
