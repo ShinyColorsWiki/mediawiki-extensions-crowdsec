@@ -2,6 +2,7 @@
 namespace MediaWiki\Extension\CrowdSec;
 
 use FormatJson;
+use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use RequestContext;
 use Status;
@@ -15,8 +16,13 @@ class LAPIClient {
 	 * @var mixed
 	 */
 	private $cache;
+	/**
+	 * @var mixed
+	 */
+	private $logger;
 
 	public function __construct() {
+		$this->logger = LoggerFactory::getInstance( 'crowdsec' );
 		$this->cache = wfGetMainCache();
 	}
 
@@ -110,12 +116,12 @@ class LAPIClient {
 			$errors = $info->getErrorsArray();
 			$error = $errors[0][0];
 		} elseif ( is_array( $info ) ) {
-			$error = implode( ',', $info );
+			$error = json_encode( $info );
 		} else {
 			$error = $info;
 		}
 
-		\wfDebugLog( 'crowdsec', 'Unable to validate response: ' . $error );
+		$this->loggger->error( 'Unable to validate response: {error}', [ 'error' => $error ] );
 	}
 
 	/**
@@ -123,7 +129,7 @@ class LAPIClient {
 	 * @param mixed $info
 	 */
 	private function log( $info ) {
-		\wfDebugLog( 'crowdsec', $info );
+		$this->loggger->debug( $info );
 	}
 
 	/**

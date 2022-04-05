@@ -213,11 +213,12 @@ class Hooks {
 		}
 
 		$client = new LAPIClient();
-		if ( IPUtils::isIPAddress( $ip ) && $client->getDecision( $ip ) != "ok" ) {
+		$lapiType = $client->getDecision( $ip );
+		if ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
 			$msg[] = Html::rawElement(
 				'span',
 				[ 'class' => 'mw-crowdsec-denylisted' ],
-				wfMessage( 'crowdsec-is-blocked', $ip )->parse()
+				wfMessage( 'crowdsec-is-blocked', $ip, $lapiType )->parse()
 			);
 		}
 
