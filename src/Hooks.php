@@ -25,7 +25,7 @@ class Hooks {
 			if ( $ip === false ) {
 				$result = false;
 			} else {
-				$result = ( new LAPIClient() )->getDecision( $ip );
+				$result = ( LAPIClient::singleton() )->getDecision( $ip );
 			}
 
 			return false;
@@ -143,7 +143,7 @@ class Hooks {
 			return true;
 		}
 
-		$client = new LAPIClient();
+		$client = LAPIClient::singleton();
 		$lapiResult = $client->getDecision( $ip );
 
 		if ( $lapiResult == false ) {
@@ -212,7 +212,7 @@ class Hooks {
 			return true;
 		}
 
-		$client = new LAPIClient();
+		$client = LAPIClient::singleton();
 		$lapiType = $client->getDecision( $ip );
 		if ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
 			$msg[] = Html::rawElement(

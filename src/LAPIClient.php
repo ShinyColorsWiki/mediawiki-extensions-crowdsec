@@ -8,22 +8,24 @@ use RequestContext;
 use Status;
 
 class LAPIClient {
-	/**
-	 * @var mixed
-	 */
+	/** @var mixed */
 	private $error = null;
-	/**
-	 * @var mixed
-	 */
+	/** @var mixed */
 	private $cache;
-	/**
-	 * @var mixed
-	 */
+	/** @var \Psr\Log\LoggerInterface */
 	private $logger;
+	/** @var LAPIClient|null */
+	protected static $instance = null;
 
 	public function __construct() {
 		$this->logger = LoggerFactory::getInstance( 'crowdsec' );
 		$this->cache = wfGetMainCache();
+	}
+
+	public static function singleton() {
+		if ( self::$instance === null ) {
+			self::$instance = new LAPIClient();
+		}
 	}
 
 	/**
@@ -83,7 +85,6 @@ class LAPIClient {
 			$this->error = 'http';
 			$this->logError( $status );
 			$this->log( $request->getContent() );
-			$this->log( $wgCrowdSecAPIKey );
 			return false;
 		}
 
@@ -133,7 +134,7 @@ class LAPIClient {
 	}
 
 	/**
-	 * Get cache key
+	 * Get cache key for ip
 	 * @param string $ip
 	 * @return bool
 	 */
