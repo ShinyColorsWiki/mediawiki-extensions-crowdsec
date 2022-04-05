@@ -26,6 +26,8 @@ class LAPIClient {
 		if ( self::$instance === null ) {
 			self::$instance = new LAPIClient();
 		}
+
+		return self::$instance;
 	}
 
 	/**
