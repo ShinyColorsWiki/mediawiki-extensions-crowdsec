@@ -19,12 +19,25 @@ $wgCrowdSecAPIKey = ""; // !mendatory! Set your bouncer key from cscli. eg. `csc
 $wgCrowdSecCache = true; // Recommended to use this for perfomance.
 
 $wgCrowdSecFallbackBan = false; // If LAPI request failed, `true` will block all user. Not recommended to set `true`.
-$wgCrowdSecTreatCaptchaAsBan = false; // Use at your own risk. There's no challenge. Use with ConfirmEdit instead.
 $wgCrowdSecRestrictRead = false; // Use at your own risk. This will block the site at all who listed on CrowdSec
+$wgCrowdSecTreatTypesAsBan = []; // Use at your own risk. Since there's no challenge integrated, `captcha` will be passed too(Use ConfirmEdit instead). If you want to block `captcha` type user, then add `"captcha"` to this array.
 
 $wgCrowdSecReportOnly = false; // This Doesn't block the user. for debug purpose.
 #$wgDebugLogGroups['CrowdSec'] = '/var/log/mediawiki/crowdsec.log'; // for debug purpose.
 ```
+
+You should setup CrowdSec and CrowdSec LAPI, Configurations too.
+Also highly recommend to register CAPI(Central API) for pull blocklist from central.
+
+## User rights
+* `crowdsec-bypass`: allows users to bypass blocks.
+
+## AbuseFilter
+There's AbuseFilter Integration. The variable `crowdsec_blocked` is representing...
+* `false`: LAPI Request was failed somehow. Check your configuration.
+* `ok`: This user is ok to process.
+* `ban`: This user is reported for "ban" from LAPI.
+* ... and various types via CrowdSec. including `captcha`
 
 ## Thanks
 * Main method for block user is based on [StopForumSpam Extension](https://mediawiki.org/wiki/Extension:StopForumSpam).
