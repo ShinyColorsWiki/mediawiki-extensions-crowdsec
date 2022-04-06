@@ -8,6 +8,6 @@
 	"action-crowdsecblock-bypass": "{{doc-action|crowdsecblock-bypass}}",
 	"right-crowdsecblock-bypass": "{{doc-right|crowdsecblock-bypass}}",
 	"crowdsec-blocked": "Message a user sees when their IP address is denylisted and they cannot edit.\n\nParameters:\n* $1 - the user's current IP address",
-	"crowdsec-desc": "{{desc|name=CrowdSec|url=https://github.com/ShinyColorsWiki/mediawiki-extension-crowdsec}}",
+	"crowdsec-desc": "{{desc|name=CrowdSec|url=https://www.mediawiki.org/wiki/Extension:CrowdSec}}",
 	"crowdsec-is-blocked": "Shown when going to block an IP address that is currently denylisted.\n\nParameters:\n* $1 - the IP address\n* $2 - the Type of result"
 }

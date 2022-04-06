@@ -1,9 +1,9 @@
-# CrowdSec Extension
+# [CrowdSec Extension](https://www.mediawiki.org/wiki/Extension:CrowdSec)
 This extension is does a job for [CrowdSec](https://crowdsec.net) bouncer for mediawiki.
 
 ## Note
 ### **This extension is highly experimental. Use at your own risk.**
- * There's no challenge method. You can block the 'captcha' type using `$wgCrowdSecTreatCaptchaAsBan`.
+ * There's no challenge method. You can block the 'captcha' type using `$wgCrowdSecTreatTypesAsBan`.
     - Recommended to use with ConfirmEdit. It blocks some kind of things.
  * This extension is tested on Mediawiki 1.35. but it may work with lower version of Mediawiki too.
 
@@ -15,7 +15,7 @@ wfLoadExtension( 'CrowdSec' ); // Load Extension
 $wgCrowdSecEnable = true; // Set false to disable
 
 $wgCrowdSecAPIUrl = "http://localhost:8080"; // your crowdsec lapi address
-$wgCrowdSecAPIKey = ""; // !mendatory! Set your bouncer key from cscli. eg. `cscli bouncers add mediawiki-bouncer`
+$wgCrowdSecAPIKey = ""; // !mandatory! Set your bouncer key from cscli. eg. `cscli bouncers add mediawiki-bouncer`
 
 $wgCrowdSecCache = true; // Recommended to use this for perfomance.
 $wgCrowdSecCacheTTL = 604800; // Cache TTL. In seconds. Default to 7 days but it's nice to set 2 hours if can handle it. (2 hours is default CAPI pull interval)
@@ -32,11 +32,11 @@ You should setup CrowdSec and CrowdSec LAPI, Configurations too.
 Also highly recommend to register CAPI(Central API) for pull blocklist from central.
 
 ## User rights
-* `crowdsec-bypass`: allows users to bypass blocks.
+* `crowdsec-bypass`: allows users to bypass crowdsec check.
 
 ## AbuseFilter
 There's AbuseFilter Integration. The variable `crowdsec_blocked` is representing...
-* `false`: LAPI Request was failed somehow. Check your configuration.
+* `false`: LAPI Request was failed. or failed to get user ip.
 * `ok`: This user is ok to process.
 * `ban`: This user is reported for "ban" from LAPI.
 * ... and various (custom) types via CrowdSec. including `captcha`.
