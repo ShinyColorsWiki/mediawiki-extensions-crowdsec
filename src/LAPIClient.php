@@ -74,7 +74,6 @@ class LAPIClient {
 		// if not found on cache
 		if ( $result === false ) {
 			$result = $this->requestDecision( $ip );
-			// set ttl to 7 days.
 			$this->cache->set( $cacheKey, $result, $wgCrowdSecCacheTTL );
 		}
 
