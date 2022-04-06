@@ -249,9 +249,9 @@ class Hooks {
 	 * @return bool
 	 */
 	private static function isConfigOk() {
-		global $wgCrowdSecEnabled, $wgCrowdSecAPIKey, $wgCrowdSecAPIUrl;
+		global $wgCrowdSecEnable, $wgCrowdSecAPIKey, $wgCrowdSecAPIUrl;
 		$localApi = ( isset( $wgCrowdSecAPIKey ) && isset( $wgCrowdSecAPIUrl ) )
 				&& !( empty( $wgCrowdSecAPIKey ) || empty( $wgCrowdSecAPIUrl ) );
-		return $wgCrowdSecEnabled && $localApi;
+		return $wgCrowdSecEnable && $localApi;
 	}
 }
