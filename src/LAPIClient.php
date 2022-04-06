@@ -64,7 +64,7 @@ class LAPIClient {
 	 * @return string
 	 */
 	public function getDecision( string $ip ) {
-		global $wgCrowdSecCache;
+		global $wgCrowdSecCache, $wgCrowdSecCacheTTL;
 		if ( !$wgCrowdSecCache ) {
 			return $this->requestDecision( $ip );
 		}
@@ -75,7 +75,7 @@ class LAPIClient {
 		if ( $result === false ) {
 			$result = $this->requestDecision( $ip );
 			// set ttl to 7 days.
-			$this->statCache->set( $cacheKey, $result, 604800 );
+			$this->cache->set( $cacheKey, $result, $wgCrowdSecCacheTTL );
 		}
 
 		return $result;

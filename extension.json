@@ -38,13 +38,17 @@
 			"description": "CrowdSec's cache config. Default to `true` for performance",
 			"value": true
 		},
+		"CrowdSecCacheTTL": {
+			"description": "CrowdSec's Cache TTL. In seoncds. default to `604800` which is 7 days. (60 * 60 * 24 * 7)",
+			"value": 604800
+		},
 		"CrowdSecFallbackBan": {
 			"description": "If enabled, When LAPI throws error, It ban the user. Default to false.",
 			"value": false 
 		},
-		"CrowdSecTreatCaptchaAsBan": {
-			"description": "Extension currently doesn't not challenge the user when captcha decision. Use this when your wiki experiencing extream spams. Default to `false`.",
-			"value": false
+		"CrowdSecTreatTypesAsBan": {
+			"description": "Type to treat as ban. Default to `[]`.",
+			"value": []
 		},
 		"CrowdSecRestrictRead": {
 			"description": "If enabled, IP who blocked doesn't read the wiki at all too. Not recommended to enable this. Default to `false`",

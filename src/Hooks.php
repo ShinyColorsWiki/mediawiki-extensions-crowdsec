@@ -112,7 +112,7 @@ class Hooks {
 	 * @return bool
 	 */
 	public static function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
-		global $wgCrowdSecReportOnly, $wgBlockAllowsUTEdit, $wgCrowdSecTreatCaptchaAsBan,
+		global $wgCrowdSecReportOnly, $wgBlockAllowsUTEdit, $wgCrowdSecTreatTypesAsBan,
 			   $wgCrowdSecFallbackBan, $wgCrowdSecRestrictRead;
 
 		if ( !self::isConfigOk() ) {
@@ -143,10 +143,11 @@ class Hooks {
 		// allow if user has crowdsec-bypass
 		if ( $user->isAllowed( 'crowdsec-bypass' ) ) {
 			$logger->info(
-				"{user} is exempt from CrowdSec blocks.",
+				"{user} is exempt from CrowdSec blocks. on {title} doing {action}",
 				[
+					'action' => $action,
 					'clientip' => $ip,
-					'reportonly' => $wgCrowdSecReportOnly,
+					'title' => $title->getPrefixedText(),
 					'user' => $user->getName()
 				]
 			);
@@ -154,10 +155,10 @@ class Hooks {
 		}
 
 		// allow if user is exempted from autoblocks (borrowed from TorBlock)
-		if ( DatabaseBlock::isExemptedFromAutoblocks( $ip ) ) {
+		if ( self::isExemptedFromAutoblocks( $ip ) ) {
 			$logger->info(
 				"{clientip} is in autoblock exemption list. Exempting from crowdsec blocks.",
-				[ 'clientip' => $ip, 'reportonly' => $wgCrowdSecReportOnly ]
+				[ 'clientip' => $ip ]
 			);
 			return true;
 		}
@@ -199,7 +200,7 @@ class Hooks {
 			return true;
 		}
 
-		if ( $lapiResult == "captcha" && !$wgCrowdSecTreatCaptchaAsBan ) {
+		if ( !in_array( $lapiResult, $wgCrowdSecTreatTypesAsBan ) ) {
 			return true;
 		}
 
@@ -253,5 +254,27 @@ class Hooks {
 		$localApi = ( isset( $wgCrowdSecAPIKey ) && isset( $wgCrowdSecAPIUrl ) )
 				&& !( empty( $wgCrowdSecAPIKey ) || empty( $wgCrowdSecAPIUrl ) );
 		return $wgCrowdSecEnable && $localApi;
+	}
+
+	/**
+	 * Checks whether a given IP is on the autoblock whitelist.
+	 * This is fix for compatibility with 1.35.
+	 * As WikiMedia replaces function name `isWhitelistedFromAutoblocks` to `isExemptedFromAutoblocks`
+	 *
+	 * @param string $ip The IP to check
+	 * @return bool
+	 */
+	private static function isExemptedFromAutoblocks( $ip ) {
+		// Mediawiki >= 1.36
+		if ( method_exists( DatabaseBlock::class, 'isExemptedFromAutoblocks' ) ) {
+			return DatabaseBlock::isExemptedFromAutoblocks( $ip );
+		}
+
+		// Mediawiki <= 1.35
+		if ( method_exists( DatabaseBlock::class, 'isWhitelistedFromAutoblocks' ) ) {
+			return DatabaseBlock::isWhitelistedFromAutoblocks( $ip );
+		}
+
+		return false;
 	}
 }
