@@ -29,7 +29,7 @@ use Status;
 class LAPIClient {
 	/** @var mixed */
 	private $error = null;
-	/** @var mixed */
+	/** @var BagOStuff */
 	private $cache;
 	/** @var \Psr\Log\LoggerInterface */
 	private $logger;
