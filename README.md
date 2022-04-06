@@ -5,6 +5,7 @@ This extension is does a job for [CrowdSec](https://crowdsec.net) bouncer for me
 ### **This extension is highly experimental. Use at your own risk.**
  * There's no challenge method. You can block the 'captcha' type using `$wgCrowdSecTreatCaptchaAsBan`.
     - Recommended to use with ConfirmEdit. It blocks some kind of things.
+ * This extension is tested on Mediawiki 1.35. but it may work with lower version of Mediawiki too.
 
 ## Configuration 
 in `LocalSettings.php`
@@ -17,10 +18,11 @@ $wgCrowdSecAPIUrl = "http://localhost:8080"; // your crowdsec lapi address
 $wgCrowdSecAPIKey = ""; // !mendatory! Set your bouncer key from cscli. eg. `cscli bouncers add mediawiki-bouncer`
 
 $wgCrowdSecCache = true; // Recommended to use this for perfomance.
+$wgCrowdSecCacheTTL = 604800; // Cache TTL. In seconds. Default to 7 days but it's nice to set 2 hours if can handle it. (2 hours is default CAPI pull interval)
 
 $wgCrowdSecFallbackBan = false; // If LAPI request failed, `true` will block all user. Not recommended to set `true`.
 $wgCrowdSecRestrictRead = false; // Use at your own risk. This will block the site at all who listed on CrowdSec
-$wgCrowdSecTreatTypesAsBan = []; // Use at your own risk. Since there's no challenge integrated, `captcha` will be passed too(Use ConfirmEdit instead). If you want to block `captcha` type user, then add `"captcha"` to this array.
+$wgCrowdSecTreatTypesAsBan = []; // Use at your own risk. Since there's no challenge integration, `captcha` will be passed too(Use ConfirmEdit instead). If you want to block `captcha` type user, then add `"captcha"` to this array.
 
 $wgCrowdSecReportOnly = false; // This Doesn't block the user. for debug purpose.
 #$wgDebugLogGroups['CrowdSec'] = '/var/log/mediawiki/crowdsec.log'; // for debug purpose.
@@ -37,7 +39,7 @@ There's AbuseFilter Integration. The variable `crowdsec_blocked` is representing
 * `false`: LAPI Request was failed somehow. Check your configuration.
 * `ok`: This user is ok to process.
 * `ban`: This user is reported for "ban" from LAPI.
-* ... and various types via CrowdSec. including `captcha`
+* ... and various (custom) types via CrowdSec. including `captcha`.
 
 ## Thanks
 * Main method for block user is based on [StopForumSpam Extension](https://mediawiki.org/wiki/Extension:StopForumSpam).
