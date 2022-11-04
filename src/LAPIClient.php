@@ -23,6 +23,7 @@ namespace MediaWiki\Extension\CrowdSec;
 use FormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\ObjectCache;
 use RequestContext;
 use Status;
 
