@@ -38,7 +38,7 @@ class LAPIClient {
 
 	public function __construct() {
 		$this->logger = LoggerFactory::getInstance( 'crowdsec' );
-		$this->cache = wfGetMainCache();
+		$this->cache =  ObjectCache::getLocalClusterInstance();
 	}
 
 	public static function singleton() {
