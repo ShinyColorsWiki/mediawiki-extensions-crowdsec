@@ -143,7 +143,7 @@ class LAPIClient {
 			$error = $info;
 		}
 
-		$this->loggger->error( 'Unable to validate response: {error}', [ 'error' => $error ] );
+		$this->logger->error( 'Unable to validate response: {error}', [ 'error' => $error ] );
 	}
 
 	/**
@@ -151,7 +151,7 @@ class LAPIClient {
 	 * @param mixed $info
 	 */
 	private function log( $info ) {
-		$this->loggger->debug( $info );
+		$this->logger->debug( $info );
 	}
 
 	/**
