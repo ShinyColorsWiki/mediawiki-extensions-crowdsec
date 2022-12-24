@@ -133,7 +133,7 @@ class LAPIClient {
 	 * log error
 	 * @param mixed $info
 	 */
-	private function logError( $info ) {
+	private function logError( $info ): void {
 		if ( $info instanceof Status ) {
 			$errors = $info->getErrorsArray();
 			$error = $errors[0][0];
@@ -150,14 +150,14 @@ class LAPIClient {
 	 * log debug
 	 * @param mixed $info
 	 */
-	private function log( $info ) {
+	private function log( $info ): void {
 		$this->logger->debug( $info );
 	}
 
 	/**
 	 * Get cache key for ip
 	 * @param string $ip
-	 * @return bool
+	 * @return string
 	 */
 	protected function getCacheKey( $ip ) {
 		return $this->cache->makeKey( 'CrowdSecLocalAPI', 'decision', $ip );

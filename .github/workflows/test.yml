@@ -10,13 +10,13 @@ env:
 jobs:
   # PHP linters: phpcs, parallel-lint, etc.
   linter:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: '7.4'
-            tools: composer:v1
+            php-version: '8.1'
+            tools: composer:v2
       - uses: actions/cache@v2
         with:
           path: ~/.composer/cache
@@ -26,16 +26,16 @@ jobs:
 
   # Phan (PHP static analyzer)
   phan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
-      branch: REL1_35
+      branch: REL1_39
     steps:
       - uses: actions/checkout@v2
       - uses: shivammathur/setup-php@v2
         with:
             php-version: '7.4'
             extensions: ast
-            tools: composer:v1
+            tools: composer:v2
       - uses: actions/cache@v2
         with:
           path: |
@@ -64,15 +64,15 @@ jobs:
         mockhttptrait: [false]
         include: # Test will fail since 1.36. See https://phabricator.wikimedia.org/T265628
           - php: 7.4
-            branch: REL1_36
+            branch: REL1_38
             mockhttptrait: true
-          - php: 7.4
-            branch: REL1_37
+          - php: [8.0, 8.1]
+            branch: REL1_39
             mockhttptrait: true
     env:
       USE_MOCK: 1
       branch: ${{ matrix.branch }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       memcached:
         image: memcached:latest
