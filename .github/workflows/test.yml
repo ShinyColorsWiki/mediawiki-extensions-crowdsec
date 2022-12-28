@@ -105,7 +105,7 @@ jobs:
         with:
             php-version: ${{ matrix.php }}
             extensions: mbstring, intl, opcache, mysqli
-            tools: composer:v1
+            tools: composer${{ env.branch != 'REL1_39' && ':v1' || '' }}
       - name: (debug) Print "php -i"
         run: php -i
       - uses: edwardspec/github-action-build-mediawiki@v1
