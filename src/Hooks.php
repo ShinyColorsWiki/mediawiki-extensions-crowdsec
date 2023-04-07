@@ -128,7 +128,7 @@ class Hooks {
 			return true;
 		}
 
-		$logger = LoggerFactory::getInstance( 'crowdsec' );
+		$logger = LoggerFactory::getInstance( 'CrowdSec' );
 		$ip = self::getIPFromUser( $user );
 
 		// attempt to get ip from user

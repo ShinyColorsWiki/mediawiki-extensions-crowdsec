@@ -38,7 +38,7 @@ class LAPIClient {
 	protected static $instance = null;
 
 	public function __construct() {
-		$this->logger = LoggerFactory::getInstance( 'crowdsec' );
+		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = ObjectCache::getLocalClusterInstance();
 	}
 
@@ -67,17 +67,22 @@ class LAPIClient {
 	public function getDecision( string $ip ) {
 		global $wgCrowdSecCache, $wgCrowdSecCacheTTL;
 		if ( !$wgCrowdSecCache ) {
-			return $this->requestDecision( $ip );
+			$result = $this->requestDecision( $ip );
+
+			$this->logDebug( __METHOD__ . ': [no cache] The result of IP "' . $ip . '" is "' . $result . '".' );
+			return $result;
 		}
 
 		$cacheKey = $this->getCacheKey( $ip );
 		$result = $this->cache->get( $cacheKey );
 		// if not found on cache
 		if ( $result === false ) {
+			$this->logDebug( __METHOD__ . ': The IP "' . $ip . '" wasn\'t found on cache. request decision.' );
 			$result = $this->requestDecision( $ip );
 			$this->cache->set( $cacheKey, $result, $wgCrowdSecCacheTTL );
 		}
 
+		$this->logDebug( __METHOD__ . ': The result of IP "' . $ip . '" is "' . $result . '".' );
 		return $result;
 	}
 
@@ -105,7 +110,7 @@ class LAPIClient {
 		if ( !$status->isOK() ) {
 			$this->error = 'http';
 			$this->logError( $status );
-			$this->log( $request->getContent() );
+			$this->logDebug( $request->getContent() );
 			return false;
 		}
 
@@ -150,8 +155,16 @@ class LAPIClient {
 	 * log debug
 	 * @param mixed $info
 	 */
-	private function log( $info ): void {
+	private function logDebug( $info ): void {
 		$this->logger->debug( $info );
+	}
+
+	/**
+	 * log info
+	 * @param mixed $info
+	 */
+	private function logInfo( $info ): void {
+			$this->logger->info( $info );
 	}
 
 	/**
