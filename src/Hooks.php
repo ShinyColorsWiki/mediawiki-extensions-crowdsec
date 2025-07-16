@@ -87,6 +87,8 @@ class Hooks {
 	 * @param MediaWiki\Title\Title &$title Title being acted upon
 	 * @param MediaWiki\User\User &$user User performing the action
 	 * @param string $action Action being performed
+	 * @param array &$result Will be filled with block status if blocked
+	 * @return bool
 	 */
 	public function onGetUserPermissionsErrors( &$title, &$user, $action, &$result ) {
 		// if ( $action === 'read' && $this->config->get( 'CrowdSecRestrictRead' ) ) {
