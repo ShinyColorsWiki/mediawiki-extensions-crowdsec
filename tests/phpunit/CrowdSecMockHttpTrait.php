@@ -35,7 +35,7 @@ trait CrowdSecMockHttpTrait {
 		$this->installMockHttp(
 			$this->makeFakeHttpMultiClient( [ [
 				'code' => 200,
-				'body' => FormatJson::encode( [
+				'body' => json_encode( [
 					[
 						'id' => 1,
 						'origin' => 'test',
@@ -46,7 +46,7 @@ trait CrowdSecMockHttpTrait {
 						'scenario' => 'test',
 						'simulated' => true,
 					]
-				] ),
+				], JSON_UNESCAPED_SLASHES ),
 			] ] )
 		);
 	}
