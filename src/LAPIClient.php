@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CrowdSec LAPI Client implementation using MediaWiki Service.
+ * CrowdSec LocalAPI Client implementation using MediaWiki Service.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

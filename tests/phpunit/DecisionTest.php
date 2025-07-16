@@ -26,13 +26,35 @@ use MediaWiki\Extension\CrowdSec\LAPIClient;
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
 class DecisionTest extends \MediaWikiIntegrationTestCase {
+	use CrowdSecMockHttpTrait;
+
 	/**
 	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
 	 */
-	public function testDecision() {
-		$client = LAPIClient::singleton();
+	public function testBanDecision() {
+		$this->setupBanDecision( "127.0.0.1", "ban" );
+
+		$client = new LAPIClient();
 		$this->assertSame( "ban", $client->getDecision( "127.0.0.1" ) );
+	}
+
+	/**
+	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
+	 */
+	public function testCaptchaDecision() {
+		$this->setupBanDecision( "127.0.0.2", "captcha" );
+
+		$client = new LAPIClient();
 		$this->assertSame( "captcha", $client->getDecision( "127.0.0.2" ) );
+	}
+
+	/**
+	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
+	 */
+	public function testOkDecision() {
+		$this->setupBanDecision( "127.0.0.3", "ok" );
+
+		$client = new LAPIClient();
 		$this->assertSame( "ok", $client->getDecision( "127.0.0.3" ) );
 	}
 }
