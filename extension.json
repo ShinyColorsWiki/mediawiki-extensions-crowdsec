@@ -65,6 +65,12 @@
     "getUserPermissionsErrorsExpensive": "MediaWiki\\Extension\\CrowdSec\\Hooks::onGetUserPermissionsErrorsExpensive",
     "OtherBlockLogLink": "MediaWiki\\Extension\\CrowdSec\\Hooks::onOtherBlockLogLink"
   },
+  "HookHandlers": {
+    "hooks": {
+      "class": "MediaWiki\\Extension\\CrowdSec\\Hooks",
+      "services": ["MainConfig"]
+    }
+  },
   "MessagesDirs": {
     "CrowdSec": ["i18n"]
   },

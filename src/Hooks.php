@@ -20,16 +20,27 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use Html;
+use MediaWiki\Config\Config;
+use MediaWiki\Html\Html;
 use MediaWiki\Block\DatabaseBlock;
 use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
 use MediaWiki\Logger\LoggerFactory;
-use RequestContext;
-use Title;
-use User;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Title\Title;
+use MediaWiki\User\User;
 use Wikimedia\IPUtils;
 
 class Hooks {
+	/** @var Config */
+	private Config $config;
+	
+	/**
+	 * @param Config $config
+	 */
+	public function __construct( Config $config ) {
+		$this->config = $config;
+	}
+
 	/**
 	 * Computes the crowdsec-blocked variable
 	 * @param string $method
@@ -45,6 +56,10 @@ class Hooks {
 				$result = false;
 			} else {
 				$result = ( LAPIClient::singleton() )->getDecision( $ip );
+				StatsUtil::singleton()->incrementDecisionQuery();
+				if ( $result === false ) {
+					StatsUtil::singleton()->incrementLAPIError();
+				}
 			}
 
 			return false;
@@ -88,10 +103,6 @@ class Hooks {
 	 * @return bool|string IP address or false
 	 */
 	private static function getIPFromUser( User $user ) {
-		if ( $user->isAnon() ) {
-			return $user->getName();
-		}
-
 		$context = RequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same
@@ -166,7 +177,10 @@ class Hooks {
 		$client = LAPIClient::singleton();
 		$lapiResult = $client->getDecision( $ip );
 
+		StatsUtil::singleton()->incrementDecisionQuery();
+
 		if ( $lapiResult == false ) {
+			StatsUtil::singleton()->incrementLAPIError();
 			$logger->info(
 				"{user} tripped CrowdSec List doing {action} "
 				. "by using {clientip} on \"{title}\". "
@@ -197,6 +211,7 @@ class Hooks {
 					'user' => $user->getName()
 				]
 			);
+			StatsUtil::singleton()->incrementReportOnly( $lapiResult );
 			return true;
 		}
 
@@ -216,6 +231,7 @@ class Hooks {
 				'user' => $user->getName()
 			]
 		);
+		StatsUtil::singleton()->incrementBlock( $lapiResult );
 
 		// default: set error msg result and return false
 		$result = [ 'crowdsec-blocked', $ip ];
@@ -228,13 +244,16 @@ class Hooks {
 	 * @return bool
 	 */
 	public static function onOtherBlockLogLink( &$msg, $ip ) {
-		if ( !self::isConfigOk() ) {
+		if ( !self::isConfigOk() || $this->config->get( 'CrowdSecReportOnly' ) ) {
 			return true;
 		}
 
 		$client = LAPIClient::singleton();
 		$lapiType = $client->getDecision( $ip );
-		if ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
+		StatsUtil::singleton()->incrementDecisionQuery();
+		if ( $lapiType === false ) {
+			StatsUtil::singleton()->incrementLAPIError();
+		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
 			$msg[] = Html::rawElement(
 				'span',
 				[ 'class' => 'mw-crowdsec-denylisted' ],
@@ -249,11 +268,13 @@ class Hooks {
 	 * Check config is ok
 	 * @return bool
 	 */
-	private static function isConfigOk() {
-		global $wgCrowdSecEnable, $wgCrowdSecAPIKey, $wgCrowdSecAPIUrl;
-		$localApi = ( isset( $wgCrowdSecAPIKey ) && isset( $wgCrowdSecAPIUrl ) )
-				&& !( empty( $wgCrowdSecAPIKey ) || empty( $wgCrowdSecAPIUrl ) );
-		return $wgCrowdSecEnable && $localApi;
+	private function isConfigOk() {
+		$enabled = $this->config->get( 'CrowdSecEnable' );
+		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
+		$apiUrl = $this->config->get( 'CrowdSecAPIUrl' );
+		$localApi = ( isset( $apiKey ) && isset( $apiUrl ) )
+				&& !( empty( $apiKey ) || empty( $apiUrl ) );
+		return $enabled && $localApi;
 	}
 
 	/**
@@ -265,16 +286,12 @@ class Hooks {
 	 * @return bool
 	 */
 	private static function isExemptedFromAutoblocks( $ip ) {
-		// Mediawiki >= 1.36
+		// Mediawiki <= 1.41
 		if ( method_exists( DatabaseBlock::class, 'isExemptedFromAutoblocks' ) ) {
 			return DatabaseBlock::isExemptedFromAutoblocks( $ip );
 		}
 
-		// Mediawiki <= 1.35
-		if ( method_exists( DatabaseBlock::class, 'isWhitelistedFromAutoblocks' ) ) {
-			return DatabaseBlock::isWhitelistedFromAutoblocks( $ip );
-		}
-
-		return false;
+		// Mediawiki >= 1.42
+		return MediaWikiServices::getInstance()->getAutoblockExemptionList()->isExempt( $ip );
 	}
 }
