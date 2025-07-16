@@ -27,7 +27,9 @@ use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
+use MediaWiki\Context\RequestContext;
 use Wikimedia\IPUtils;
+
 
 class Hooks {
 	/** @var Config */
@@ -244,7 +246,7 @@ class Hooks {
 	 * @param User $user
 	 * @return bool|string IP address or false
 	 */
-	private static function getIPFromUser( User $user ) {
+	private static function getIPFromUser( $user ) {
 		$context = RequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same
