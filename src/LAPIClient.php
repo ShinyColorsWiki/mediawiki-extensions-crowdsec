@@ -48,7 +48,6 @@ if ( class_exists( 'FormatJson' ) ) {
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
 use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
 
 class LAPIClient {
