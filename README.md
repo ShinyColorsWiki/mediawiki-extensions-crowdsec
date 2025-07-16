@@ -5,7 +5,7 @@ This extension is does a job for [CrowdSec](https://crowdsec.net) bouncer for me
 ### **This extension is highly experimental. Use at your own risk.**
  * There's no challenge method. You can block the 'captcha' type using `$wgCrowdSecTreatTypesAsBan`.
     - Recommended to use with [ConfirmEdit](https://www.mediawiki.org/wiki/Extension:ConfirmEdit). It blocks some kind of things.
- * This extension is tested on Mediawiki 1.39. but it may work with lower version of Mediawiki too.
+ * This extension is tested on Mediawiki 1.43. Minimum required version is **1.41+**
 
 ## Configuration 
 in `LocalSettings.php`
@@ -20,7 +20,7 @@ $wgCrowdSecAPIKey = ""; // !mandatory! Set your bouncer key from cscli. eg. `csc
 $wgCrowdSecCache = true; // Recommended to use this for perfomance.
 $wgCrowdSecCacheTTL = 604800; // Cache TTL. In seconds. Default to 7 days but it's nice to set 2 hours if can handle it. (2 hours is default CAPI pull interval)
 
-$wgCrowdSecFallbackBan = false; // If LAPI request failed, `true` will block all user. Not recommended to set `true`.
+$wgCrowdSecFallback = 'ok'; // When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default/Invalid value to `ok`
 $wgCrowdSecRestrictRead = false; // Use at your own risk. This will block the site at all who listed on CrowdSec
 $wgCrowdSecTreatTypesAsBan = []; // Use at your own risk. Since there's no challenge integration, `captcha` will be passed too(Use ConfirmEdit instead). If you want to block `captcha` type user, then add `"captcha"` to this array.
 

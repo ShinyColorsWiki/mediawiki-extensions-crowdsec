@@ -1,13 +1,11 @@
 {
-	"@metadata": {
-		"authors": [
-			"MPThLee"
-		]
-	},
-	"abusefilter-edit-builder-vars-crowdsec-blocked": "Whether the IP address is listed on CrowdSec list",
-	"action-crowdsecblock-bypass": "bypass denylisted IP blocks issued by the CrowdSec extension",
-	"right-crowdsecblock-bypass": "Bypass IP blocks issued by the CrowdSec extension",
-	"crowdsec-blocked": "Editing from your IP address ($1) has been blocked since it has recently been used to spam websites.",
-	"crowdsec-desc": "Integration with [https://crowdsec.net/ CrowdSec]",
-	"crowdsec-is-blocked": "The IP address <strong>[https://crowdsec.net/unban-my-ip/ $1]</strong> has been blocked. Type: $2"
+  "@metadata": {
+    "authors": ["MPThLee"]
+  },
+  "abusefilter-edit-builder-vars-crowdsec-decision": "The CrowdSec decision for the IP address",
+  "action-crowdsecblock-bypass": "bypass denylisted IP blocks issued by the CrowdSec extension",
+  "right-crowdsecblock-bypass": "Bypass IP blocks issued by the CrowdSec extension",
+  "crowdsec-blocked": "Editing from your IP address ($1) has been blocked since it has recently been used to spam websites.",
+  "crowdsec-desc": "Integration with [https://crowdsec.net/ CrowdSec]",
+  "crowdsec-is-blocked": "The IP address <strong>[https://crowdsec.net/unban-my-ip/ $1]</strong> has been blocked. Type: $2"
 }

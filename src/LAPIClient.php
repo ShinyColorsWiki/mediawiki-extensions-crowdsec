@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CrowdSec LAPI Client implementation using MediaWiki Service.
+ * CrowdSec LocalAPI Client implementation using MediaWiki Service.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,10 @@ class LAPIClient {
 		}
 
 		return self::$instance;
+	}
+
+	public static function destroy() {
+		self::$instance = null;
 	}
 
 	/**
@@ -115,11 +119,11 @@ class LAPIClient {
 		}
 
 		$content = $request->getContent();
-		if ( $content === "null" ) {
+		if ( $content === "" ) {
 			return "ok";
 		}
 
-		$response = FormatJson::decode( $request->getContent(), true );
+		$response = FormatJson::decode( $content, true );
 		if ( !$response ) {
 			$this->error = 'json';
 			$this->logError( $this->error );
@@ -127,7 +131,7 @@ class LAPIClient {
 		}
 		if ( !isset( $response[0] ) || !isset( $response[0]['type'] ) ) {
 			$this->error = 'crowdsec-lapi';
-			$this->logError( $request->getContent() );
+			$this->logError( $content );
 			return false;
 		}
 
