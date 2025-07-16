@@ -28,18 +28,22 @@ if ( class_exists( 'ObjectCache' ) && !class_exists( 'MediaWiki\\Cache\\ObjectCa
 	class_alias( 'ObjectCache', 'MediaWiki\\Cache\\ObjectCache' );
 }
 
-if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) {
-	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
-}
-
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\RequestContext' ) ) {
 	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
+}
+
+if ( class_exists( 'FormatJson' ) && !class_exists( 'MediaWiki\\Json\\FormatJson' ) ) {
+	class_alias( 'FormatJson', 'MediaWiki\\Json\\FormatJson' );
+}
+
+if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) {
+	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
-use MediaWiki\Json\FormatJson;
+use MediaWiki\Json\FormatJson as MWFormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
@@ -56,6 +60,10 @@ class LAPIClient {
 	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
+	/**
+	 * Constructor of LAPIClient
+	 * @param MediaWiki\Config\Config $config main config
+	 */
 	public function __construct( $config ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = MWObjectCache::getLocalClusterInstance();
@@ -145,7 +153,7 @@ class LAPIClient {
 			return "ok";
 		}
 
-		$response = FormatJson::decode( $content, true );
+		$response = MWFormatJson::decode( $content, true );
 		if ( !$response ) {
 			$this->error = 'json';
 			$this->logError( $this->error );
