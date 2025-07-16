@@ -202,8 +202,7 @@ class Hooks {
 			return true;
 		}
 
-		$client = LAPIClient::singleton();
-		$lapiType = $client->getDecision( $ip );
+		$lapiType = $this->lapiClient->getDecision( $ip );
 		StatsUtil::singleton()->incrementDecisionQuery( 'blocklog' );
 		if ( $lapiType === false ) {
 			StatsUtil::singleton()->incrementLAPIError( 'blocklog' );

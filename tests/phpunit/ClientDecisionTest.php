@@ -28,7 +28,7 @@ use MediaWiki\Status\Status;
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
-class DecisionTest extends \MediaWikiIntegrationTestCase {
+class ClientDecisionTest extends \MediaWikiIntegrationTestCase {
 	use \MockHttpTrait;
 
 	protected function setUp(): void {
