@@ -40,12 +40,16 @@ class Hooks {
 	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
+	/** @var LAPIClient|null */
+	private $lapiClient;
+
 	/**
 	 * Constructor of Hooks
 	 * @param MediaWiki\Config\Config $config main config
 	 */
-	public function __construct( $config ) {
+	public function __construct( $config, $httpRequestFactory ) {
 		$this->config = $config;
+		$this->lapiClient = new LAPIClient( $config, $httpRequestFactory );
 	}
 
 	/**
@@ -105,8 +109,7 @@ class Hooks {
 			);
 		}
 
-		$client = LAPIClient::singleton();
-		$lapiResult = $client->getDecision( $ip );
+		$lapiResult = $this->lapiClient->getDecision( $ip );
 
 		StatsUtil::singleton()->incrementDecisionQuery( 'permissions' );
 

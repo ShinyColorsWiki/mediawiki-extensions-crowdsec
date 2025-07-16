@@ -78,21 +78,6 @@ class LAPIClient {
 		$this->httpRequestFactory = $httpRequestFactory;
 	}
 
-	public static function singleton() {
-		if ( self::$instance === null ) {
-			self::$instance = new LAPIClient(
-				MediaWikiServices::getInstance()->getMainConfig(),
-				MediaWikiServices::getInstance()->getHttpRequestFactory()
- );
-		}
-
-		return self::$instance;
-	}
-
-	public static function destroy() {
-		self::$instance = null;
-	}
-
 	/**
 	 * handle lapi url for safe.
 	 * @param string $url
