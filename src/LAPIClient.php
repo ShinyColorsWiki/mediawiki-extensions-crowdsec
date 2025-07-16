@@ -36,10 +36,12 @@ if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) 
 	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
 }
 
+// Due to MW 1.40, FormatJson is declared weird in global namespace.
+// So can't use FormatJson directly. need to alias it to our own namespace.
 if ( class_exists( 'FormatJson' ) ) {
-	class_alias( 'FormatJson', 'MediaWiki\\Extension\\CrowdSec\\FormatJson' );
+	class_alias( 'FormatJson', 'MediaWiki\\Extension\\CrowdSec\\MWFormatJson' );
 } elseif ( class_exists( 'MediaWiki\\Json\\FormatJson' ) ) {
-	class_alias( 'MediaWiki\\Json\\FormatJson', 'MediaWiki\\Extension\\CrowdSec\\FormatJson' );
+	class_alias( 'MediaWiki\\Json\\FormatJson', 'MediaWiki\\Extension\\CrowdSec\\MWFormatJson' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 
