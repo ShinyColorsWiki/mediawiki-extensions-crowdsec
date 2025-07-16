@@ -36,8 +36,9 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testBanDecision() {
 		$this->setupBanDecision( "127.0.0.1", "ban" );
 
-		$client = new LAPIClient();
+		$client = LAPIClient::singleton();
 		$this->assertSame( "ban", $client->getDecision( "127.0.0.1" ) );
+		LAPIClient::destroy();
 	}
 
 	/**
@@ -46,8 +47,9 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testCaptchaDecision() {
 		$this->setupBanDecision( "127.0.0.2", "captcha" );
 
-		$client = new LAPIClient();
+		$client = LAPIClient::singleton();
 		$this->assertSame( "captcha", $client->getDecision( "127.0.0.2" ) );
+		LAPIClient::destroy();
 	}
 
 	/**
@@ -56,7 +58,8 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testOkDecision() {
 		$this->setupBanDecision( "127.0.0.3", "ok" );
 
-		$client = new LAPIClient();
+		$client = LAPIClient::singleton();
 		$this->assertSame( "ok", $client->getDecision( "127.0.0.3" ) );
+		LAPIClient::destroy();
 	}
 }

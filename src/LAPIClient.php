@@ -50,6 +50,10 @@ class LAPIClient {
 		return self::$instance;
 	}
 
+	public static function destroy() {
+		self::$instance = null;
+	}
+
 	/**
 	 * handle lapi url for safe.
 	 * @param string $url
