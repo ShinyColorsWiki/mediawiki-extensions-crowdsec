@@ -24,6 +24,7 @@ use MediaWiki\Block\DatabaseBlock;
 use MediaWiki\Config\Config;
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
 use Wikimedia\IPUtils;
@@ -33,7 +34,7 @@ class Hooks {
 	private Config $config;
 
 	/**
-	 * @param Config $config
+	 * Constructor of Hooks
 	 */
 	public function __construct() {
 		$this->config = MediaWikiServices::getInstance()->getMainConfig();

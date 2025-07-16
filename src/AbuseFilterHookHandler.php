@@ -8,6 +8,7 @@ use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
 use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
 use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
 use MediaWiki\RecentChanges\RecentChange;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\User\User;
 
 class AbuseFilterHookHandler implements
@@ -19,7 +20,7 @@ class AbuseFilterHookHandler implements
 	private Config $config;
 
 	/**
-	 * @param Config $config
+	 * Constructor of AbuseFilterHookHandler
 	 */
 	public function __construct() {
 		$this->config = MediaWikiServices::getInstance()->getMainConfig();
