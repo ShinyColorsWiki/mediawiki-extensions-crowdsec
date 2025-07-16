@@ -23,13 +23,11 @@ namespace MediaWiki\Extension\CrowdSec\Tests;
 use MediaWiki\Extension\CrowdSec\LAPIClient;
 use MediaWiki\MediaWikiServices;
 
-// use MockHttpTrait;
-
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
 class DecisionTest extends \MediaWikiIntegrationTestCase {
-	use MockHttpTrait;
+	use \MockHttpTrait;
 
 	/**
 	 * Setup a mock HTTP response for a ban decision.
