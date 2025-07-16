@@ -32,12 +32,8 @@ if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\Status\Status' ) ) {
 	class_alias( 'Status', 'MediaWiki\Status\Status' );
 }
 
-if ( class_exists( 'FormatJson' ) && !class_exists( 'Mediawiki\Json\FormatJson' ) ) {
-	class_alias( 'FormatJson', 'Mediawiki\Json\FormatJson' );
-}
-
-if ( class_exists( 'Config' ) && !class_exists( 'MediaWiki\Config\Config' ) ) {
-	class_alias( 'Config', 'MediaWiki\Config\Config' );
+if ( class_exists( 'FormatJson' ) && !class_exists( 'MediaWiki\Json\FormatJson' ) ) {
+	class_alias( 'FormatJson', 'MediaWiki\Json\FormatJson' );
 }
 
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
@@ -45,29 +41,28 @@ if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\Reque
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 
-use MediaWiki\Cache\ObjectCache;
-use MediaWiki\Config\Config;
-use MediaWiki\Context\RequestContext;
-use Mediawiki\Json\FormatJson;
+use MediaWiki\Cache\ObjectCache as MWObjectCache;
+use MediaWiki\Context\RequestContext as MWRequestContext;
+use Mediawiki\Json\FormatJson as MWFormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
-use MediaWiki\Status\Status;
+use MediaWiki\Status\Status as MWStatus;
 
 class LAPIClient {
 	/** @var mixed */
 	private $error = null;
-	/** @var BagOStuff */
+	/** @var MediaWiki\Cache\BagOStuff */
 	private $cache;
-	/** @var \Psr\Log\LoggerInterface */
+	/** @var Psr\Log\LoggerInterface */
 	private $logger;
 	/** @var LAPIClient|null */
 	protected static $instance = null;
-	/** @var Config|null */
+	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
 	public function __construct( $config ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
-		$this->cache = ObjectCache::getLocalClusterInstance();
+		$this->cache = MWObjectCache::getLocalClusterInstance();
 		$this->config = $config;
 	}
 
@@ -129,7 +124,7 @@ class LAPIClient {
 		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
 		$apiUrl = $this->config->get( 'CrowdSecAPIUrl' );
 
-		$webRequest = RequestContext::getMain()->getRequest();
+		$webRequest = MWRequestContext::getMain()->getRequest();
 
 		$url = self::apiUrlHandler( $apiUrl ) . 'v1/decisions?scope=ip&ip=' . $ip;
 		$options = [
@@ -154,7 +149,7 @@ class LAPIClient {
 			return "ok";
 		}
 
-		$response = FormatJson::decode( $content, true );
+		$response = MWFormatJson::decode( $content, true );
 		if ( !$response ) {
 			$this->error = 'json';
 			$this->logError( $this->error );
@@ -174,7 +169,7 @@ class LAPIClient {
 	 * @param mixed $info
 	 */
 	private function logError( $info ): void {
-		if ( $info instanceof Status ) {
+		if ( $info instanceof MWStatus ) {
 			$errors = $info->getErrorsArray();
 			$error = $errors[0][0];
 		} elseif ( is_array( $info ) ) {

@@ -21,24 +21,8 @@
 namespace MediaWiki\Extension\CrowdSec;
 
 // === Compatibility for MediaWiki 1.39 ===
-if ( class_exists( 'User' ) && !class_exists( 'MediaWiki\User\User' ) ) {
-	class_alias( 'User', 'MediaWiki\User\User' );
-}
-
-if ( class_exists( 'Title' ) && !class_exists( 'MediaWiki\Title\Title' ) ) {
-	class_alias( 'Title', 'MediaWiki\Title\Title' );
-}
-
-if ( class_exists( 'Config' ) && !class_exists( 'MediaWiki\Config\Config' ) ) {
-	class_alias( 'Config', 'MediaWiki\Config\Config' );
-}
-
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
 	class_alias( 'RequestContext', 'MediaWiki\Context\RequestContext' );
-}
-
-if ( class_exists( 'DatabaseBlock' ) && !class_exists( 'MediaWiki\Block\DatabaseBlock' ) ) {
-	class_alias( 'DatabaseBlock', 'MediaWiki\Block\DatabaseBlock' );
 }
 
 if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\Html\Html' ) ) {
@@ -47,21 +31,18 @@ if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\Html\Html' ) ) {
 // === End of Compatibility for MediaWiki 1.39 ===
 
 use MediaWiki\Block\DatabaseBlock;
-use MediaWiki\Config\Config;
-use MediaWiki\Context\RequestContext;
-use MediaWiki\Html\Html;
-use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\Title\Title;
-use MediaWiki\User\User;
+use MediaWiki\Context\RequestContext as MWRequestContext;
+use MediaWiki\Html\Html as MWHtml;
+use MediaWiki\Logger\LoggerFactory as MWLoggerFactory;
 use Wikimedia\IPUtils;
 
 class Hooks {
-	/** @var Config|null */
+	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
 	/**
 	 * Constructor of Hooks
-	 * @param Config $config main config
+	 * @param MediaWiki\Config\Config $config main config
 	 */
 	public function __construct( $config ) {
 		$this->config = $config;
@@ -70,8 +51,8 @@ class Hooks {
 	/**
 	 * If an IP address is denylisted, don't let them edit.
 	 *
-	 * @param Title &$title Title being acted upon
-	 * @param User &$user User performing the action
+	 * @param MediaWiki\Title\Title &$title Title being acted upon
+	 * @param MediaWiki\User\User &$user User performing the action
 	 * @param string $action Action being performed
 	 * @param array &$result Will be filled with block status if blocked
 	 * @return bool
@@ -90,7 +71,7 @@ class Hooks {
 			return true;
 		}
 
-		$logger = LoggerFactory::getInstance( 'CrowdSec' );
+		$logger = MWLoggerFactory::getInstance( 'CrowdSec' );
 		$ip = self::getIPFromUser( $user );
 
 		$exemptReasons = [];
@@ -224,7 +205,7 @@ class Hooks {
 		if ( $lapiType === false ) {
 			StatsUtil::singleton()->incrementLAPIError( 'blocklog' );
 		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
-			$msg[] = Html::rawElement(
+			$msg[] = MWHtml::rawElement(
 				'span',
 				[ 'class' => 'mw-crowdsec-denylisted' ],
 				wfMessage( 'crowdsec-is-blocked', $ip, $lapiType )->parse()
@@ -268,11 +249,11 @@ class Hooks {
 	/**
 	 * Get an IP address for a User if possible
 	 *
-	 * @param User $user
+	 * @param MediaWiki\User\User $user
 	 * @return bool|string IP address or false
 	 */
 	private static function getIPFromUser( $user ) {
-		$context = RequestContext::getMain();
+		$context = MWRequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same
 			return $context->getRequest()->getIP();

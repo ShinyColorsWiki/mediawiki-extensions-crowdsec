@@ -47,7 +47,7 @@ class StatsUtil {
 	public static function singleton(): StatsUtil {
 		if ( self::$instance === null ) {
 			try {
-                $sf = MediaWikiServices::getInstance()->getStatsFactory();
+				$sf = MediaWikiServices::getInstance()->getStatsFactory();
 				self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
 			} catch ( \Exception $e ) {
 				// It is supported since MediaWiki 1.41+
