@@ -17,10 +17,10 @@ wfLoadExtension( 'CrowdSec' );
 $wgCrowdSecEnable = true;
 
 // Your CrowdSec LAPI address
-$wgCrowdSecAPIUrl = &quot;http://localhost:8080&quot;;
+$wgCrowdSecAPIUrl = 'http://localhost:8080';
 
 // Mandatory: Set your bouncer key from cscli, e.g., `cscli bouncers add mediawiki-bouncer`
-$wgCrowdSecAPIKey = &quot;&quot;;
+$wgCrowdSecAPIKey = '';
 
 // Recommended for performance
 $wgCrowdSecCache = true;
@@ -34,7 +34,7 @@ $wgCrowdSecFallback = 'ok';
 // Use at your own risk: Blocks all access for users listed in CrowdSec
 $wgCrowdSecRestrictRead = false;
 
-// Use at your own risk: Treat specified decision types as bans. Since there is no challenge integration, 'captcha' decisions are passed by default (use ConfirmEdit instead). To block 'captcha', add &quot;captcha&quot; to this array.
+// Use at your own risk: Treat specified decision types as bans. Since there is no challenge integration, 'captcha' decisions are passed by default (use ConfirmEdit instead). To block 'captcha', add 'captcha' to this array.
 $wgCrowdSecTreatTypesAsBan = [];
 
 // Report only mode: Does not block users, for debugging purposes
