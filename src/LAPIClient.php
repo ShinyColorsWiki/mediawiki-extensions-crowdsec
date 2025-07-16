@@ -63,16 +63,17 @@ class LAPIClient {
 	/** @var LAPIClient|null */
 	protected static $instance = null;
 	/** @var Config */
+	private Config $config;
 
-	public function __construct() {
+	public function __construct( Config $config ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = ObjectCache::getLocalClusterInstance();
-		$this->config = MediaWikiServices::getInstance()->getMainConfig();
+		$this->config = $config;
 	}
 
 	public static function singleton() {
 		if ( self::$instance === null ) {
-			self::$instance = new LAPIClient();
+			self::$instance = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
 		}
 
 		return self::$instance;

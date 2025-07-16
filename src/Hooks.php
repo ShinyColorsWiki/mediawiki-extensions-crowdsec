@@ -20,7 +20,6 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-
 // === Compatibility for MediaWiki 1.39 ===
 if ( class_exists( '\User' ) && !class_exists( '\MediaWiki\User\User' ) ) {
 	class_alias( '\User', '\MediaWiki\User\User' );

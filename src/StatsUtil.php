@@ -20,7 +20,6 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-
 use MediaWiki\MediaWikiServices;
 
 /**

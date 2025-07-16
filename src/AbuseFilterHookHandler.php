@@ -2,7 +2,6 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-
 // === Compatibility for MediaWiki 1.39 ===
 if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
 	class_alias( '\Config', '\MediaWiki\Config\Config' );
