@@ -32,10 +32,6 @@ if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\Status\Status' ) ) {
 	class_alias( 'Status', 'MediaWiki\Status\Status' );
 }
 
-if ( class_exists( 'FormatJson' ) && !class_exists( 'MediaWiki\Json\FormatJson' ) ) {
-	class_alias( 'FormatJson', 'MediaWiki\Json\FormatJson' );
-}
-
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
 	class_alias( 'RequestContext', 'MediaWiki\Context\RequestContext' );
 }
@@ -43,7 +39,7 @@ if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\Reque
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
-use Mediawiki\Json\FormatJson as MWFormatJson;
+use Mediawiki\Json\FormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
@@ -149,7 +145,7 @@ class LAPIClient {
 			return "ok";
 		}
 
-		$response = MWFormatJson::decode( $content, true );
+		$response = FormatJson::decode( $content, true );
 		if ( !$response ) {
 			$this->error = 'json';
 			$this->logError( $this->error );
