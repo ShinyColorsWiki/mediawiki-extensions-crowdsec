@@ -136,9 +136,13 @@ class LAPIClient {
 
 		// Before MW1.40, HttpRequestFactory is NullHttpRequestFactory during hook execution even in test.
 		// This is a workaround to avoid the error. Remove this when MW1.40 and older are no longer supported.
-		if ( defined( 'MW_PHPUNIT_TEST' ) && $this->httpRequestFactory instanceof NullHttpRequestFactory ) {
-			$this->logError( 'Invalid HttpRequestFactory instance during test, returning false early.' );
-			return false;
+		if ( defined( 'MW_PHPUNIT_TEST' ) ) {
+			try {
+				$this->httpRequestFactory->create( $url, $options, __METHOD__ );
+			} catch ( \Exception $e ) {
+				$this->logError( 'Invalid HttpRequestFactory instance during test, returning false early.' );
+				return false;
+			}
 		}
 
 		$request = $this->httpRequestFactory
