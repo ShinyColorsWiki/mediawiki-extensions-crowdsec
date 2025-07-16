@@ -47,6 +47,7 @@ if ( class_exists( 'FormatJson' ) ) {
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
+use MediaWiki\Http\NullHttpRequestFactory;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Status\Status as MWStatus;
 
@@ -68,7 +69,7 @@ class LAPIClient {
 	/**
 	 * Constructor of LAPIClient
 	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
+	 * @param MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
@@ -132,6 +133,13 @@ class LAPIClient {
 		$options = [
 			'method' => 'GET',
 		];
+
+		// Before MW1.40, HttpRequestFactory is NullHttpRequestFactory during hook execution even in test.
+		// This is a workaround to avoid the error. Remove this when MW1.40 and older are no longer supported.
+		if ( defined( 'MW_PHPUNIT_TEST' ) && $this->httpRequestFactory instanceof NullHttpRequestFactory ) {
+			$this->logError( 'Invalid HttpRequestFactory instance during test, returning false early.' );
+			return false;
+		}
 
 		$request = $this->httpRequestFactory
 			->create( $url, $options, __METHOD__ );
