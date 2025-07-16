@@ -22,13 +22,37 @@ namespace MediaWiki\Extension\CrowdSec\Tests;
 
 use MediaWiki\Extension\CrowdSec\LAPIClient;
 
-// use MediaWiki\Extension\CrowdSec\Tests\CrowdSecMockHttpTrait;
-
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
 class DecisionTest extends \MediaWikiIntegrationTestCase {
-	use CrowdSecMockHttpTrait;
+	use MockHttpTrait;
+
+	/**
+	 * Setup a mock HTTP response for a ban decision.
+	 *
+	 * @param string $ip The IP address to ban.
+	 * @param string $type The type of decision to return.
+	 */
+	protected function setupBanDecision( string $ip, string $type ) {
+		$this->installMockHttp(
+			$this->makeFakeHttpMultiClient( [ [
+				'code' => 200,
+				'body' => json_encode( [
+					[
+						'id' => 1,
+						'origin' => 'test',
+						'type' => $type,
+						'scope' => 'Ip',
+						'value' => $ip,
+						'duration' => "4h0m0s",
+						'scenario' => 'test',
+						'simulated' => true,
+					]
+				], JSON_UNESCAPED_SLASHES ),
+			] ] )
+		);
+	}
 
 	/**
 	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
@@ -36,9 +60,8 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testBanDecision() {
 		$this->setupBanDecision( "127.0.0.1", "ban" );
 
-		$client = LAPIClient::singleton();
+		$client = new LAPIClient();
 		$this->assertSame( "ban", $client->getDecision( "127.0.0.1" ) );
-		LAPIClient::destroy();
 	}
 
 	/**
@@ -47,9 +70,8 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testCaptchaDecision() {
 		$this->setupBanDecision( "127.0.0.2", "captcha" );
 
-		$client = LAPIClient::singleton();
+		$client = new LAPIClient();
 		$this->assertSame( "captcha", $client->getDecision( "127.0.0.2" ) );
-		LAPIClient::destroy();
 	}
 
 	/**
@@ -58,8 +80,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testOkDecision() {
 		$this->setupBanDecision( "127.0.0.3", "ok" );
 
-		$client = LAPIClient::singleton();
+		$client = new LAPIClient();
 		$this->assertSame( "ok", $client->getDecision( "127.0.0.3" ) );
-		LAPIClient::destroy();
 	}
 }
