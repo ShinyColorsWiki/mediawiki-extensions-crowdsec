@@ -69,18 +69,13 @@ class LAPIClient {
 	/**
 	 * Constructor of LAPIClient
 	 * @param MediaWiki\Config\Config $config main config
-	 * @param ?MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
+	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
 	 */
-	public function __construct( $config, $httpRequestFactory = null ) {
+	public function __construct( $config, $httpRequestFactory ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = MWObjectCache::getLocalClusterInstance();
 		$this->config = $config;
-		if ( $httpRequestFactory !== null ) {
-			$this->httpRequestFactory = $httpRequestFactory;
-		} else {
-			// Older version of MediaWiki doesn't have the HttpRequestFactory service. get from MediaWikiServices.
-			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
-		}
+		$this->httpRequestFactory = $httpRequestFactory;
 	}
 
 	/**

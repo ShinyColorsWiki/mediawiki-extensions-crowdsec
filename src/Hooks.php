@@ -40,16 +40,25 @@ class Hooks {
 	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
+	/** @var MediaWiki\Http\HttpRequestFactory|null */
+	private $httpRequestFactory;
+
 	/** @var LAPIClient|null */
 	private $lapiClient;
 
 	/**
 	 * Constructor of Hooks
 	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
+	 * @param ?MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
-	public function __construct( $config, $httpRequestFactory ) {
+	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->config = $config;
+		if ( $httpRequestFactory !== null ) {
+			$this->httpRequestFactory = $httpRequestFactory;
+		} else {
+			// Older version of MediaWiki doesn't have the HttpRequestFactory service. get from MediaWikiServices.
+			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
+		}
 		$this->lapiClient = new LAPIClient( $config, $httpRequestFactory );
 	}
 

@@ -70,6 +70,16 @@ jobs:
           - REL1_44 # beta
           - REL1_45 # alpha
           - master # future
+        exclude:
+          # PHP 8.4 is not supported on MediaWiki 1.39, 1.40, 1.41, 1.42
+          - php: 8.4
+            mw-branch: REL1_39
+          - php: 8.4
+            mw-branch: REL1_40
+          - php: 8.4
+            mw-branch: REL1_41
+          - php: 8.4
+            mw-branch: REL1_42
     env:
       USE_MOCK: 1
       branch: ${{ matrix.mw-branch }}
