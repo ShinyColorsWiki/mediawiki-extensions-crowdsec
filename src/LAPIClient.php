@@ -119,7 +119,7 @@ class LAPIClient {
 		}
 
 		$content = $request->getContent();
-		if ( $content === "" ) {
+		if ( $content === "" || $content === "null" || $content === "[]" ) {
 			return "ok";
 		}
 
