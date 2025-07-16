@@ -23,6 +23,7 @@ namespace MediaWiki\Extension\CrowdSec\Tests;
 use MediaWiki\Extension\CrowdSec\LAPIClient;
 use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Status\Status;
 
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
@@ -46,13 +47,14 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 *
 	 * @param string $ip The IP address to ban.
 	 * @param string $type The type of decision to return.
+	 * @return LAPIClient The LAPIClient instance with mocked HTTP request.
 	 */
-	protected function getDecisionClient( $ip, $decision ) {
-		$expectedResponse = $decision === "ok" ? '' : json_encode( [
+	protected function getDecisionClient( $ip, $type ) {
+		$expectedResponse = $type === "ok" ? '' : json_encode( [
 			[
 				'id' => 1,
 				'origin' => 'test',
-				'type' => $decision,
+				'type' => $type,
 				'scope' => 'Ip',
 				'value' => $ip,
 				'duration' => "4h0m0s",
@@ -77,9 +79,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testBanDecision() {
 		$decision = "ban";
 		$ip = "127.0.0.1";
-		$this->setupDecision( $ip, $decision );
-
-		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
+		$client = $this->getDecisionClient( $ip, $decision );
 		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 
@@ -89,9 +89,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testCaptchaDecision() {
 		$decision = "captcha";
 		$ip = "127.0.0.2";
-		$this->setupDecision( $ip, $decision );
-
-		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
+		$client = $this->getDecisionClient( $ip, $decision );
 		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 
@@ -101,9 +99,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	public function testOkDecision() {
 		$decision = "ok";
 		$ip = "127.0.0.3";
-		$this->setupDecision( $ip, $decision );
-
-		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
+		$client = $this->getDecisionClient( $ip, $decision );
 		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 }
