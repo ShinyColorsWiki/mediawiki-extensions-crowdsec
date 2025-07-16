@@ -48,6 +48,7 @@ if ( class_exists( 'FormatJson' ) ) {
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
 
 class LAPIClient {
@@ -68,13 +69,18 @@ class LAPIClient {
 	/**
 	 * Constructor of LAPIClient
 	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
+	 * @param ?MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
 	 */
-	public function __construct( $config, $httpRequestFactory ) {
+	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = MWObjectCache::getLocalClusterInstance();
 		$this->config = $config;
-		$this->httpRequestFactory = $httpRequestFactory;
+		if ( $httpRequestFactory !== null ) {
+			$this->httpRequestFactory = $httpRequestFactory;
+		} else {
+			// Older version of MediaWiki doesn't have the HttpRequestFactory service. get from MediaWikiServices.
+			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
+		}
 	}
 
 	/**
