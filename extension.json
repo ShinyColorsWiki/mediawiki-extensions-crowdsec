@@ -6,7 +6,7 @@
   "license-name": "GPL-2.0+",
   "type": "antispam",
   "requires": {
-    "MediaWiki": ">= 1.35.0"
+    "MediaWiki": ">= 1.39"
   },
   "AvailableRights": ["crowdsec-bypass"],
   "GroupPermissions": {
@@ -41,9 +41,9 @@
       "description": "CrowdSec's Cache TTL. In seoncds. default to `604800` which is 7 days. (60 * 60 * 24 * 7)",
       "value": 604800
     },
-    "CrowdSecFallbackBan": {
-      "description": "If enabled, When LAPI throws error, It ban the user. Default to false.",
-      "value": false
+    "CrowdSecFallback": {
+      "description": "When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default to `ok`",
+      "value": "ok"
     },
     "CrowdSecTreatTypesAsBan": {
       "description": "Type to treat as ban. Default to `[]`.",
@@ -59,13 +59,17 @@
     }
   },
   "Hooks": {
-    "AbuseFilter-computeVariable": "MediaWiki\\Extension\\CrowdSec\\Hooks::abuseFilterComputeVariable",
-    "AbuseFilter-generateUserVars": "MediaWiki\\Extension\\CrowdSec\\Hooks::abuseFilterGenerateUserVars",
-    "AbuseFilter-builder": "MediaWiki\\Extension\\CrowdSec\\Hooks::abuseFilterBuilder",
-    "getUserPermissionsErrorsExpensive": "MediaWiki\\Extension\\CrowdSec\\Hooks::onGetUserPermissionsErrorsExpensive",
-    "OtherBlockLogLink": "MediaWiki\\Extension\\CrowdSec\\Hooks::onOtherBlockLogLink"
+    "AbuseFilter-computeVariable": "abusefilter",
+    "AbuseFilter-generateUserVars": "abusefilter",
+    "AbuseFilter-builder": "abusefilter",
+    "getUserPermissionsErrorsExpensive": "hooks",
+    "OtherBlockLogLink": "hooks"
   },
   "HookHandlers": {
+    "abusefilter": {
+      "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler",
+      "services": ["MainConfig"]
+    },
     "hooks": {
       "class": "MediaWiki\\Extension\\CrowdSec\\Hooks",
       "services": ["MainConfig"]

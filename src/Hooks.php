@@ -42,78 +42,6 @@ class Hooks {
 	}
 
 	/**
-	 * Computes the crowdsec-blocked variable
-	 * @param string $method
-	 * @param VariableHolder $vars
-	 * @param array $parameters
-	 * @param null &$result
-	 * @return bool
-	 */
-	public static function abuseFilterComputeVariable( $method, $vars, $parameters, &$result ) {
-		if ( $method == 'crowdsec-blocked' ) {
-			$ip = self::getIPFromUser( $parameters['user'] );
-			if ( $ip === false ) {
-				$result = false;
-			} else {
-				$result = ( LAPIClient::singleton() )->getDecision( $ip );
-				StatsUtil::singleton()->incrementDecisionQuery();
-				if ( $result === false ) {
-					StatsUtil::singleton()->incrementLAPIError();
-				}
-			}
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Load our blocked variable
-	 * @param VariableHolder $vars
-	 * @param User $user
-	 * @return bool
-	 */
-	public static function abuseFilterGenerateUserVars( $vars, $user ) {
-		if ( self::isConfigOk() ) {
-			$vars->setLazyLoadVar( 'crowdsec_blocked', 'crowdsec-blocked', [ 'user' => $user ] );
-		}
-
-		return true;
-	}
-
-	/**
-	 * Tell AbuseFilter about our crowdsec-blocked variable
-	 * @param array &$builderValues
-	 * @return bool
-	 */
-	public static function abuseFilterBuilder( &$builderValues ) {
-		if ( self::isConfigOk() ) {
-			// Uses: 'abusefilter-edit-builder-vars-crowdsec-blocked'
-			$builderValues['vars']['crowdsec_blocked'] = 'crowdsec-blocked';
-		}
-
-		return true;
-	}
-
-	/**
-	 * Get an IP address for a User if possible
-	 *
-	 * @param User $user
-	 * @return bool|string IP address or false
-	 */
-	private static function getIPFromUser( User $user ) {
-		$context = RequestContext::getMain();
-		if ( $context->getUser()->getName() === $user->getName() ) {
-			// Only use the main context if the users are the same
-			return $context->getRequest()->getIP();
-		}
-
-		// Couldn't figure out an IP address
-		return false;
-	}
-
-	/**
 	 * If an IP address is denylisted, don't let them edit.
 	 *
 	 * @param Title &$title Title being acted upon
@@ -122,19 +50,16 @@ class Hooks {
 	 * @param array &$result Will be filled with block status if blocked
 	 * @return bool
 	 */
-	public static function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
-		global $wgCrowdSecReportOnly, $wgBlockAllowsUTEdit, $wgCrowdSecTreatTypesAsBan,
-			   $wgCrowdSecFallbackBan, $wgCrowdSecRestrictRead;
-
-		if ( !self::isConfigOk() ) {
+	public function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
+		if ( !$this->isConfigOk() ) {
 			// Not configured
 			return true;
 		}
 
-		if ( $action === 'read' && !$wgCrowdSecRestrictRead ) {
+		if ( $action === 'read' && !$this->config->get( 'CrowdSecRestrictRead' ) ) {
 			return true;
 		}
-		if ( $wgBlockAllowsUTEdit && $title->equals( $user->getTalkPage() ) ) {
+		if ( $this->config->get( 'BlockAllowsUTEdit' ) && $title->equals( $user->getTalkPage() ) ) {
 			// Let a user edit their talk page
 			return true;
 		}
@@ -142,19 +67,19 @@ class Hooks {
 		$logger = LoggerFactory::getInstance( 'CrowdSec' );
 		$ip = self::getIPFromUser( $user );
 
+		$exemptReasons = [];
+
 		// attempt to get ip from user
 		if ( $ip === false ) {
-			$logger->info(
-				"Unable to obtain IP information for {user}.",
-				[ 'user' => $user->getName() ]
-			);
-			return true;
+			$exemptReasons[] = "Unable to obtain IP information for {user}.";
+			$logger->info( $exemptReasons[0], [ 'user' => $user->getName() ] );
 		}
 
 		// allow if user has crowdsec-bypass
 		if ( $user->isAllowed( 'crowdsec-bypass' ) ) {
+			$exemptReasons[] = "{user} is exempt from CrowdSec blocks. on {title} doing {action}";
 			$logger->info(
-				"{user} is exempt from CrowdSec blocks. on {title} doing {action}",
+				$exemptReasons[count($exemptReasons)-1],
 				[
 					'action' => $action,
 					'clientip' => $ip,
@@ -162,16 +87,15 @@ class Hooks {
 					'user' => $user->getName()
 				]
 			);
-			return true;
 		}
 
 		// allow if user is exempted from autoblocks (borrowed from TorBlock)
 		if ( self::isExemptedFromAutoblocks( $ip ) ) {
+			$exemptReasons[] = "{clientip} is in autoblock exemption list. Exempting from crowdsec blocks.";
 			$logger->info(
-				"{clientip} is in autoblock exemption list. Exempting from crowdsec blocks.",
+				$exemptReasons[count($exemptReasons)-1],
 				[ 'clientip' => $ip ]
 			);
-			return true;
 		}
 
 		$client = LAPIClient::singleton();
@@ -192,36 +116,46 @@ class Hooks {
 					'user' => $user->getName()
 				]
 			);
-			return !$wgCrowdSecFallbackBan;
+			$fallback = $this->config->get( 'CrowdSecFallback' );
+			if ( $fallback === 'ok' ) {
+				return true;
+			} elseif ( $fallback === 'ban' ) {
+				$lapiResult = 'ban'; // Treat as ban for fallback
+			} elseif ( $fallback === 'captcha' ) {
+				$lapiResult = 'captcha'; // Treat as captcha for fallback
+			}
 		}
 
-		if ( $lapiResult == "ok" ) {
-			return true;
-		}
+		$isBlocked = ( $lapiResult != "ok" && in_array( $lapiResult, $this->config->get( 'CrowdSecTreatTypesAsBan' ) ) );
 
-		if ( $wgCrowdSecReportOnly ) {
+		if ( !$this->config->get( 'CrowdSecReportOnly' ) ) {
+			// Enforce mode: if not blocked or has exemptions, allow
+			if ( !$isBlocked || count( $exemptReasons ) > 0 ) {
+				return true;
+			}
+		} elseif ( $isBlocked && count( $exemptReasons ) > 0 ) {
+			// Report-only mode + blocked + exemptions: log exemptions and allow
+			$exemptReasonsStr = implode( ', ', $exemptReasons );
 			$logger->info(
-				"Report Only: {user} tripped CrowdSec List doing {action} ({type}) "
-				. "by using {clientip} on \"{title}\".",
+				$exemptReasonsStr,
 				[
 					'action' => $action,
-					'type' => $lapiResult,
 					'clientip' => $ip,
 					'title' => $title->getPrefixedText(),
-					'user' => $user->getName()
+					'user' => $user->getName(),
+					'reportonly' => true
 				]
 			);
-			StatsUtil::singleton()->incrementReportOnly( $lapiResult );
+			return true;
+		} elseif ( !$isBlocked ) {
+			// Report-only mode + not blocked: allow
 			return true;
 		}
 
-		if ( !in_array( $lapiResult, $wgCrowdSecTreatTypesAsBan ) ) {
-			return true;
-		}
-
-		// log action when blocked, return error msg
+		// Log the block (or potential block in report-only)
+		$blockVerb = ( $this->config->get( 'CrowdSecReportOnly' ) ) ? 'would have been' : 'was';
 		$logger->info(
-			"{user} was blocked by CrowdSec from doing {action} ({type}) "
+			"{user} {$blockVerb} blocked by CrowdSec from doing {action} ({type}) "
 			. "by using {clientip} on \"{title}\".",
 			[
 				'action' => $action,
@@ -231,9 +165,15 @@ class Hooks {
 				'user' => $user->getName()
 			]
 		);
-		StatsUtil::singleton()->incrementBlock( $lapiResult );
 
-		// default: set error msg result and return false
+		if ( $this->config->get( 'CrowdSecReportOnly' ) ) {
+			StatsUtil::singleton()->incrementReportOnly( $lapiResult );
+			return true;
+		} else {
+			StatsUtil::singleton()->incrementBlock( $lapiResult );
+		}
+
+		// Set error and block
 		$result = [ 'crowdsec-blocked', $ip ];
 		return false;
 	}
@@ -243,8 +183,8 @@ class Hooks {
 	 * @param string $ip
 	 * @return bool
 	 */
-	public static function onOtherBlockLogLink( &$msg, $ip ) {
-		if ( !self::isConfigOk() || $this->config->get( 'CrowdSecReportOnly' ) ) {
+	public function onOtherBlockLogLink( &$msg, $ip ) {
+		if ( !$this->isConfigOk() || $this->config->get( 'CrowdSecReportOnly' ) ) {
 			return true;
 		}
 
