@@ -102,6 +102,9 @@ class LAPIClient {
 	public function getDecision( string $ip ) {
 		$cacheEnabled = $this->config->get( 'CrowdSecCache' );
 		$cacheTTL = $this->config->get( 'CrowdSecCacheTTL' );
+
+		$this->logDebug( __METHOD__ . ': got request for ip ' . $ip );
+
 		if ( !$cacheEnabled ) {
 			$result = $this->requestDecision( $ip );
 
