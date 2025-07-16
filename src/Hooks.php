@@ -20,12 +20,10 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
+use MediaWiki\Block\DatabaseBlock;
 use MediaWiki\Config\Config;
 use MediaWiki\Html\Html;
-use MediaWiki\Block\DatabaseBlock;
-use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
 use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
 use Wikimedia\IPUtils;
@@ -33,7 +31,7 @@ use Wikimedia\IPUtils;
 class Hooks {
 	/** @var Config */
 	private Config $config;
-	
+
 	/**
 	 * @param Config $config
 	 */
@@ -79,7 +77,7 @@ class Hooks {
 		if ( $user->isAllowed( 'crowdsec-bypass' ) ) {
 			$exemptReasons[] = "{user} is exempt from CrowdSec blocks. on {title} doing {action}";
 			$logger->info(
-				$exemptReasons[count($exemptReasons)-1],
+				$exemptReasons[count( $exemptReasons ) - 1],
 				[
 					'action' => $action,
 					'clientip' => $ip,
@@ -93,7 +91,7 @@ class Hooks {
 		if ( self::isExemptedFromAutoblocks( $ip ) ) {
 			$exemptReasons[] = "{clientip} is in autoblock exemption list. Exempting from crowdsec blocks.";
 			$logger->info(
-				$exemptReasons[count($exemptReasons)-1],
+				$exemptReasons[count( $exemptReasons ) - 1],
 				[ 'clientip' => $ip ]
 			);
 		}
@@ -101,10 +99,10 @@ class Hooks {
 		$client = LAPIClient::singleton();
 		$lapiResult = $client->getDecision( $ip );
 
-		StatsUtil::singleton()->incrementDecisionQuery();
+		StatsUtil::singleton()->incrementDecisionQuery( 'permissions' );
 
 		if ( $lapiResult == false ) {
-			StatsUtil::singleton()->incrementLAPIError();
+			StatsUtil::singleton()->incrementLAPIError( 'permissions' );
 			$logger->info(
 				"{user} tripped CrowdSec List doing {action} "
 				. "by using {clientip} on \"{title}\". "
@@ -120,13 +118,16 @@ class Hooks {
 			if ( $fallback === 'ok' ) {
 				return true;
 			} elseif ( $fallback === 'ban' ) {
-				$lapiResult = 'ban'; // Treat as ban for fallback
+				// Treat as ban for fallback
+				$lapiResult = 'ban';
 			} elseif ( $fallback === 'captcha' ) {
-				$lapiResult = 'captcha'; // Treat as captcha for fallback
+				// Treat as captcha for fallback
+				$lapiResult = 'captcha';
 			}
 		}
 
-		$isBlocked = ( $lapiResult != "ok" && in_array( $lapiResult, $this->config->get( 'CrowdSecTreatTypesAsBan' ) ) );
+		$treatTypesAsBan = $this->config->get( 'CrowdSecTreatTypesAsBan' );
+		$isBlocked = ( $lapiResult != "ok" && in_array( $lapiResult, $treatTypesAsBan ) );
 
 		if ( !$this->config->get( 'CrowdSecReportOnly' ) ) {
 			// Enforce mode: if not blocked or has exemptions, allow
@@ -167,10 +168,10 @@ class Hooks {
 		);
 
 		if ( $this->config->get( 'CrowdSecReportOnly' ) ) {
-			StatsUtil::singleton()->incrementReportOnly( $lapiResult );
+			StatsUtil::singleton()->incrementReportOnly( $lapiResult, 'permissions' );
 			return true;
 		} else {
-			StatsUtil::singleton()->incrementBlock( $lapiResult );
+			StatsUtil::singleton()->incrementBlock( $lapiResult, 'permissions' );
 		}
 
 		// Set error and block
@@ -190,9 +191,9 @@ class Hooks {
 
 		$client = LAPIClient::singleton();
 		$lapiType = $client->getDecision( $ip );
-		StatsUtil::singleton()->incrementDecisionQuery();
+		StatsUtil::singleton()->incrementDecisionQuery( 'blocklog' );
 		if ( $lapiType === false ) {
-			StatsUtil::singleton()->incrementLAPIError();
+			StatsUtil::singleton()->incrementLAPIError( 'blocklog' );
 		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
 			$msg[] = Html::rawElement(
 				'span',

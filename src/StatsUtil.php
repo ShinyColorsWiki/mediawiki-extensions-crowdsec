@@ -52,35 +52,53 @@ class StatsUtil {
 
 	/**
 	 * 결정 쿼리 카운트를 증가시킵니다.
+	 * @param string $context 컨텍스트 (선택적)
 	 */
-	public function incrementDecisionQuery() {
-		$this->statsFactory->getCounter( 'decision_queries_total' )->increment();
+	public function incrementDecisionQuery( string $context = '' ) {
+		$counter = $this->statsFactory->getCounter( 'decision_queries_total' );
+		if ( $context ) {
+			$counter->setLabel( 'context', $context );
+		}
+		$counter->increment();
 	}
 
 	/**
 	 * LAPI 오류 카운트를 증가시킵니다.
+	 * @param string $context 컨텍스트 (선택적)
 	 */
-	public function incrementLAPIError() {
-		$this->statsFactory->getCounter( 'lapi_errors_total' )->increment();
+	public function incrementLAPIError( string $context = '' ) {
+		$counter = $this->statsFactory->getCounter( 'lapi_errors_total' );
+		if ( $context ) {
+			$counter->setLabel( 'context', $context );
+		}
+		$counter->increment();
 	}
 
 	/**
 	 * 보고 전용 모드 트리거 카운트를 증가시킵니다.
 	 * @param string $type 결정 유형
+	 * @param string $context 컨텍스트 (선택적)
 	 */
-	public function incrementReportOnly( string $type ) {
-		$this->statsFactory->getCounter( 'report_only_total' )
-			->setLabel( 'type', $type )
-			->increment();
+	public function incrementReportOnly( string $type, string $context = '' ) {
+		$counter = $this->statsFactory->getCounter( 'report_only_total' )
+			->setLabel( 'type', $type );
+		if ( $context ) {
+			$counter->setLabel( 'context', $context );
+		}
+		$counter->increment();
 	}
 
 	/**
 	 * 차단 카운트를 증가시킵니다.
 	 * @param string $type 결정 유형
+	 * @param string $context 컨텍스트 (선택적)
 	 */
-	public function incrementBlock( string $type ) {
-		$this->statsFactory->getCounter( 'blocks_total' )
-			->setLabel( 'type', $type )
-			->increment();
+	public function incrementBlock( string $type, string $context = '' ) {
+		$counter = $this->statsFactory->getCounter( 'blocks_total' )
+			->setLabel( 'type', $type );
+		if ( $context ) {
+			$counter->setLabel( 'context', $context );
+		}
+		$counter->increment();
 	}
 }
