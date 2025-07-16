@@ -237,4 +237,21 @@ class Hooks {
 		// Mediawiki >= 1.42
 		return MediaWikiServices::getInstance()->getAutoblockExemptionList()->isExempt( $ip );
 	}
+
+	/**
+	 * Get an IP address for a User if possible
+	 *
+	 * @param User $user
+	 * @return bool|string IP address or false
+	 */
+	private static function getIPFromUser( User $user ) {
+		$context = RequestContext::getMain();
+		if ( $context->getUser()->getName() === $user->getName() ) {
+			// Only use the main context if the users are the same
+			return $context->getRequest()->getIP();
+		}
+
+		// Couldn't figure out an IP address
+		return false;
+	}
 }
