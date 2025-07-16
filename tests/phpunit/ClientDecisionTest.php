@@ -34,12 +34,6 @@ class ClientDecisionTest extends \MediaWikiIntegrationTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->installMockHttp( [
-			$this->makeFakeHttpRequest( '' ),
-			$this->makeFakeHttpRequest( '' ),
-			$this->makeFakeHttpRequest( '' ),
-		] );
-
 		$this->setMwGlobals( [
 			'CrowdSecEnabled' => true,
 			'CrowdSecAPIKey' => 'TestKey1',
@@ -77,6 +71,9 @@ class ClientDecisionTest extends \MediaWikiIntegrationTestCase {
 
 		$this->setService( 'HttpRequestFactory', $mockHttpRequestFactory );
 		$this->redefineService( 'HttpRequestFactory', $mockHttpRequestFactory );
+		$this->installMockHttp( [
+			$this->makeFakeHttpRequest( $expectedResponse ),
+		] );
 
 		return new LAPIClient( MediaWikiServices::getInstance()->getMainConfig(), $mockHttpRequestFactory );
 	}
