@@ -119,11 +119,11 @@ class LAPIClient {
 		}
 
 		$content = $request->getContent();
-		if ( $content === "null" ) {
+		if ( $content === "" ) {
 			return "ok";
 		}
 
-		$response = FormatJson::decode( $request->getContent(), true );
+		$response = FormatJson::decode( $content, true );
 		if ( !$response ) {
 			$this->error = 'json';
 			$this->logError( $this->error );
@@ -131,7 +131,7 @@ class LAPIClient {
 		}
 		if ( !isset( $response[0] ) || !isset( $response[0]['type'] ) ) {
 			$this->error = 'crowdsec-lapi';
-			$this->logError( $request->getContent() );
+			$this->logError( $content );
 			return false;
 		}
 

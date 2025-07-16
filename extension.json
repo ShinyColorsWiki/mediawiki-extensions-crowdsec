@@ -67,12 +67,10 @@
   },
   "HookHandlers": {
     "abusefilter": {
-      "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler",
-      "services": ["MainConfig"]
+      "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler"
     },
     "hooks": {
-      "class": "MediaWiki\\Extension\\CrowdSec\\Hooks",
-      "services": ["MainConfig"]
+      "class": "MediaWiki\\Extension\\CrowdSec\\Hooks"
     }
   },
   "MessagesDirs": {

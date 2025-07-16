@@ -21,8 +21,8 @@ class AbuseFilterHookHandler implements
 	/**
 	 * @param Config $config
 	 */
-	public function __construct( Config $config ) {
-		$this->config = $config;
+	public function __construct() {
+		$this->config = MediaWikiServices::getInstance()->getMainConfig();
 	}
 
 	/**
