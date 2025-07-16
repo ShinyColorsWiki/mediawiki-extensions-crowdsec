@@ -60,7 +60,7 @@ class Hooks {
 			// Older version of MediaWiki doesn't have the HttpRequestFactory service. get from MediaWikiServices.
 			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
 		}
-		$this->lapiClient = new LAPIClient( $config, $httpRequestFactory );
+		$this->lapiClient = new LAPIClient( $config, $this->httpRequestFactory );
 	}
 
 	/**
