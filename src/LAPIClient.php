@@ -32,18 +32,19 @@ if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\Req
 	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
 }
 
-if ( class_exists( 'FormatJson' ) && !class_exists( 'MediaWiki\\Json\\FormatJson' ) ) {
-	class_alias( 'FormatJson', 'MediaWiki\\Json\\FormatJson' );
-}
-
 if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) {
 	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
+}
+
+if ( class_exists( 'FormatJson' ) ) {
+	class_alias( 'FormatJson', 'MediaWiki\\Extension\\CrowdSec\\FormatJson' );
+} elseif ( class_exists( 'MediaWiki\\Json\\FormatJson' ) ) {
+	class_alias( 'MediaWiki\\Json\\FormatJson', 'MediaWiki\\Extension\\CrowdSec\\FormatJson' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
-use MediaWiki\Json\FormatJson as MWFormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
