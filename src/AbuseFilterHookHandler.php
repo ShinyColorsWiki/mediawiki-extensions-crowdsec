@@ -36,7 +36,7 @@ class AbuseFilterHookHandler implements
 	 * Constructor of AbuseFilterHookHandler
 	 * @param Config $config main config
 	 */
-	public function __construct( Config $config ) {
+	public function __construct( $config ) {
 		$this->config = $config;
 	}
 

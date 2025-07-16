@@ -63,7 +63,7 @@ class Hooks {
 	 * Constructor of Hooks
 	 * @param Config $config main config
 	 */
-	public function __construct( Config $config ) {
+	public function __construct( $config ) {
 		$this->config = $config;
 	}
 
@@ -271,7 +271,7 @@ class Hooks {
 	 * @param User $user
 	 * @return bool|string IP address or false
 	 */
-	private static function getIPFromUser( User $user ) {
+	private static function getIPFromUser( $user ) {
 		$context = RequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same

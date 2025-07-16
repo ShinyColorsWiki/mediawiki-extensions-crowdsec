@@ -65,7 +65,7 @@ class LAPIClient {
 	/** @var Config */
 	private Config $config;
 
-	public function __construct( Config $config ) {
+	public function __construct( $config ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = ObjectCache::getLocalClusterInstance();
 		$this->config = $config;

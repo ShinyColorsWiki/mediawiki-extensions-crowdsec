@@ -34,14 +34,10 @@ class StatsUtil {
 
 	/**
 	 * private 생성자.
+	 * @param \MediaWiki\Metrics\MetricsFactory $statsFactory
 	 */
-	private function __construct() {
-		try {
-			$this->statsFactory = MediaWikiServices::getInstance()->getStatsFactory()->withComponent( 'CrowdSec' );
-		} catch ( \Exception $e ) {
-			// It is supported since MediaWiki 1.41+
-			$this->statsFactory = null;
-		}
+	private function __construct( $statsFactory ) {
+		$this->statsFactory = $statsFactory;
 	}
 
 	/**
@@ -50,7 +46,12 @@ class StatsUtil {
 	 */
 	public static function singleton(): StatsUtil {
 		if ( self::$instance === null ) {
-			self::$instance = new self();
+			try {
+				self::$instance = new self( MediaWikiServices::getInstance()->getStatsFactory()->withComponent( 'CrowdSec' ) );
+			} catch ( \Exception $e ) {
+				// It is supported since MediaWiki 1.41+
+				self::$instance = new self( null );
+			}
 		}
 		return self::$instance;
 	}
