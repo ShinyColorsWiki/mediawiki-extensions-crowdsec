@@ -38,18 +38,13 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	protected function setupDecision( string $ip, string $type ) {
 		if ( $type === "ok" ) {
 			$this->installMockHttp(
-				$this->makeFakeHttpMultiClient( [ [
-					'code' => 200,
-					'body' => ''
-				] ] )
+				$this->makeFakeHttpRequest( '' )
 			);
 			return;
 		}
 
 		$this->installMockHttp(
-			$this->makeFakeHttpMultiClient( [ [
-				'code' => 200,
-				'body' => json_encode( [
+			$this->makeFakeHttpRequest( json_encode( [
 					[
 						'id' => 1,
 						'origin' => 'test',
@@ -61,7 +56,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 						'simulated' => true,
 					]
 				], JSON_UNESCAPED_SLASHES ),
-			] ] )
+			);
 		);
 	}
 
