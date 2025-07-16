@@ -47,7 +47,6 @@ if ( class_exists( 'FormatJson' ) ) {
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
-use MediaWiki\Http\NullHttpRequestFactory;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Status\Status as MWStatus;
 
