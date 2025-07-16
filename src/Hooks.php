@@ -34,6 +34,7 @@ use MediaWiki\Block\DatabaseBlock;
 use MediaWiki\Context\RequestContext as MWRequestContext;
 use MediaWiki\Html\Html as MWHtml;
 use MediaWiki\Logger\LoggerFactory as MWLoggerFactory;
+use MediaWiki\MediaWikiServices;
 use Wikimedia\IPUtils;
 
 class Hooks {
