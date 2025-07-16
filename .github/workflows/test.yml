@@ -61,18 +61,19 @@ jobs:
       matrix:
         php: [8.1, 8.2, 8.3]
         mw-branch: [REL1_39, REL1_40, REL1_41, REL1_42, REL1_43, REL1_44]
+        experimental: [false]
         include:
           - php: 8.4
-            experiment: true
+            experimental: true
           - mw-branch: REL1_45
-            experiment: true
+            experimental: true
           - mw-branch: master
-            experiment: true
+            experimental: true
     env:
       USE_MOCK: 1
       branch: ${{ matrix.mw-branch }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experiment }}
+    continue-on-error: ${{ matrix.experimental }}
     services:
       memcached:
         image: memcached:latest
