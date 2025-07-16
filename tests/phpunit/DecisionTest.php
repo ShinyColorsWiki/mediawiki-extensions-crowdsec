@@ -21,6 +21,7 @@
 namespace MediaWiki\Extension\CrowdSec\Tests;
 
 use MediaWiki\Extension\CrowdSec\LAPIClient;
+use MockHttpTrait;
 
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
