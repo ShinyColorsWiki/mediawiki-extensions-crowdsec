@@ -138,6 +138,7 @@ class LAPIClient {
 		// This is a workaround to avoid the error. Remove this when MW1.40 and older are no longer supported.
 		if ( defined( 'MW_PHPUNIT_TEST' ) ) {
 			try {
+				// This will throw an exception if NullHttpRequestFactory is used.
 				$this->httpRequestFactory->create( $url, $options, __METHOD__ );
 			} catch ( \Exception $e ) {
 				$this->logError( 'Invalid HttpRequestFactory instance during test, returning false early.' );
