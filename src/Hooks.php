@@ -56,8 +56,8 @@ use MediaWiki\User\User;
 use Wikimedia\IPUtils;
 
 class Hooks {
-	/** @var Config */
-	private Config $config;
+	/** @var Config|null */
+	private $config;
 
 	/**
 	 * Constructor of Hooks
