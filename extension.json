@@ -6,7 +6,7 @@
   "license-name": "GPL-2.0+",
   "type": "antispam",
   "requires": {
-    "MediaWiki": ">= 1.41"
+    "MediaWiki": ">= 1.39"
   },
   "AvailableRights": ["crowdsec-bypass"],
   "GroupPermissions": {
@@ -19,6 +19,12 @@
   },
   "TestAutoloadClasses": {
     "MediaWiki\\Extension\\CrowdSec\\Tests\\CrowdSecMockHttpTrait": "tests/phpunit/CrowdSecMockHttpTrait.php"
+  },
+  "AutoloadClasses": {
+    "MediaWiki\\Extension\\CrowdSec\\LAPIClient": "src/LAPIClient.php",
+    "MediaWiki\\Extension\\CrowdSec\\StatsUtil": "src/StatsUtil.php",
+    "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler": "src/AbuseFilterHookHandler.php",
+    "MediaWiki\\Extension\\CrowdSec\\Hooks": "src/Hooks.php"
   },
   "config": {
     "CrowdSecEnable": {

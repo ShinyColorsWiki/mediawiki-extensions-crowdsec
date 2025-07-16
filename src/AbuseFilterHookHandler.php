@@ -2,13 +2,13 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use MediaWiki\Config\Config;
-use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
-use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
-use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
-use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
-use MediaWiki\RecentChanges\RecentChange;
-use MediaWiki\User\User;
+// use MediaWiki\Config\Config;
+// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
+// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
+// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
+// use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
+// use MediaWiki\RecentChanges\RecentChange;
+// use MediaWiki\User\User;
 
 class AbuseFilterHookHandler implements
 	AbuseFilterBuilderHook,

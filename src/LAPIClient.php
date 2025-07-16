@@ -20,13 +20,13 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use MediaWiki\Cache\ObjectCache;
-use MediaWiki\Config\Config;
-use MediaWiki\Context\RequestContext;
-use Mediawiki\Json\FormatJson;
-use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\MediaWikiServices;
-use MediaWiki\Status\Status;
+// use MediaWiki\Cache\ObjectCache;
+// use MediaWiki\Config\Config;
+// use MediaWiki\Context\RequestContext;
+// use Mediawiki\Json\FormatJson;
+// use MediaWiki\Logger\LoggerFactory;
+// use MediaWiki\MediaWikiServices;
+// use MediaWiki\Status\Status;
 
 class LAPIClient {
 	/** @var mixed */

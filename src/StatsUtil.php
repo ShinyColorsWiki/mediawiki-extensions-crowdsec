@@ -20,7 +20,7 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use MediaWiki\MediaWikiServices;
+// use MediaWiki\MediaWikiServices;
 
 /**
  * CrowdSec 확장을 위한 통계 유틸리티 클래스.

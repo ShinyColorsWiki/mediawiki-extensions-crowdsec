@@ -20,14 +20,14 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use MediaWiki\Block\DatabaseBlock;
-use MediaWiki\Config\Config;
-use MediaWiki\Context\RequestContext;
-use MediaWiki\Html\Html;
-use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\Title\Title;
-use MediaWiki\User\User;
-use Wikimedia\IPUtils;
+// use MediaWiki\Block\DatabaseBlock;
+// use MediaWiki\Config\Config;
+// use MediaWiki\Context\RequestContext;
+// use MediaWiki\Html\Html;
+// use MediaWiki\Logger\LoggerFactory;
+// use MediaWiki\Title\Title;
+// use MediaWiki\User\User;
+// use Wikimedia\IPUtils;
 
 class Hooks {
 	/** @var Config */
