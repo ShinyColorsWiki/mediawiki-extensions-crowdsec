@@ -17,7 +17,7 @@ class AbuseFilterHookHandler implements
 	AbuseFilterGenerateUserVarsHook
 {
 	/** @var Config */
-	private Config $config;
+	private $config;
 
 	/**
 	 * Constructor of AbuseFilterHookHandler
