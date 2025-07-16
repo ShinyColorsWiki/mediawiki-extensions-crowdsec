@@ -34,6 +34,12 @@ class ClientDecisionTest extends \MediaWikiIntegrationTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
+		$this->installMockHttp( [
+			$this->makeFakeHttpRequest( '' ),
+			$this->makeFakeHttpRequest( '' ),
+			$this->makeFakeHttpRequest( '' ),
+		] );
+
 		$this->setMwGlobals( [
 			'CrowdSecEnabled' => true,
 			'CrowdSecAPIKey' => 'TestKey1',
