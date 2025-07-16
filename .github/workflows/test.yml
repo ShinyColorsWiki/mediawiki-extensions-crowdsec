@@ -65,11 +65,10 @@ jobs:
           - REL1_39 # legacy LTS
           - REL1_40
           - REL1_41
-          - REL1_42
-          - REL1_43 # Current LTS
+          - REL1_42 # legacy
+          - REL1_43 # release, LTS
           - REL1_44 # beta
-          - REL1_45 # alpha
-          - master # future
+          - master # alpha, future
         exclude:
           # PHP 8.4 is not supported on MediaWiki 1.39, 1.40, 1.41, 1.42
           - php: 8.4
