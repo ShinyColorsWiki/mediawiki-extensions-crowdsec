@@ -21,12 +21,12 @@
 namespace MediaWiki\Extension\CrowdSec;
 
 // === Compatibility for MediaWiki 1.39 ===
-if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
-	class_alias( 'RequestContext', 'MediaWiki\Context\RequestContext' );
+if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\RequestContext' ) ) {
+	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
 }
 
-if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\Html\Html' ) ) {
-	class_alias( 'Html', 'MediaWiki\Html\Html' );
+if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\\Html\\Html' ) ) {
+	class_alias( 'Html', 'MediaWiki\\Html\\Html' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 

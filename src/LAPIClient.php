@@ -24,22 +24,22 @@ namespace MediaWiki\Extension\CrowdSec;
 // if ( class_exists( '\BagOStuff' ) && !class_exists( '\MediaWiki\Cache\BagOStuff' ) ) {
 // 	class_alias( '\BagOStuff', '\MediaWiki\Cache\BagOStuff' );
 // }
-if ( class_exists( 'ObjectCache' ) && !class_exists( 'MediaWiki\Cache\ObjectCache' ) ) {
-	class_alias( 'ObjectCache', 'MediaWiki\Cache\ObjectCache' );
+if ( class_exists( 'ObjectCache' ) && !class_exists( 'MediaWiki\\Cache\\ObjectCache' ) ) {
+	class_alias( 'ObjectCache', 'MediaWiki\\Cache\\ObjectCache' );
 }
 
-if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\Status\Status' ) ) {
-	class_alias( 'Status', 'MediaWiki\Status\Status' );
+if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) {
+	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
 }
 
-if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
-	class_alias( 'RequestContext', 'MediaWiki\Context\RequestContext' );
+if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\RequestContext' ) ) {
+	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 
 use MediaWiki\Cache\ObjectCache as MWObjectCache;
 use MediaWiki\Context\RequestContext as MWRequestContext;
-use Mediawiki\Json\FormatJson;
+use MediaWiki\Json\FormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Status\Status as MWStatus;
