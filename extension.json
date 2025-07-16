@@ -44,11 +44,11 @@
       "value": true
     },
     "CrowdSecCacheTTL": {
-      "description": "CrowdSec's Cache TTL. In seoncds. default to `604800` which is 7 days. (60 * 60 * 24 * 7)",
+      "description": "CrowdSec's Cache TTL. In seconds. default to `604800` which is 7 days. (60 * 60 * 24 * 7)",
       "value": 604800
     },
     "CrowdSecFallback": {
-      "description": "When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default/Invalid value to `ok`",
+      "description": "When LAPI throws an error, decide what to do. `ban`, `captcha` or `ok`. Default/Invalid value to `ok`",
       "value": "ok"
     },
     "CrowdSecTreatTypesAsBan": {
