@@ -6,7 +6,7 @@
   "license-name": "GPL-2.0+",
   "type": "antispam",
   "requires": {
-    "MediaWiki": ">= 1.39"
+    "MediaWiki": ">= 1.41"
   },
   "AvailableRights": ["crowdsec-bypass"],
   "GroupPermissions": {
@@ -67,10 +67,12 @@
   },
   "HookHandlers": {
     "abusefilter": {
-      "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler"
+      "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler",
+      "services": ["MainConfig"]
     },
     "hooks": {
-      "class": "MediaWiki\\Extension\\CrowdSec\\Hooks"
+      "class": "MediaWiki\\Extension\\CrowdSec\\Hooks",
+      "services": ["MainConfig"]
     }
   },
   "MessagesDirs": {

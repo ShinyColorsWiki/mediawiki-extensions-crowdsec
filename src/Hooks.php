@@ -20,51 +20,25 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-// === Compatibility for MediaWiki 1.39 ===
-if ( class_exists( '\User' ) && !class_exists( '\MediaWiki\User\User' ) ) {
-	class_alias( '\User', '\MediaWiki\User\User' );
-} elseif ( class_exists( '\MediaWiki\User\User' ) && !class_exists( '\User' ) ) {
-	class_alias( '\MediaWiki\User\User', '\User' );
-}
-
-if ( class_exists( '\Title' ) && !class_exists( '\MediaWiki\Title\Title' ) ) {
-	class_alias( '\Title', '\MediaWiki\Title\Title' );
-} elseif ( class_exists( '\MediaWiki\Title\Title' ) && !class_exists( '\Title' ) ) {
-	class_alias( '\MediaWiki\Title\Title', '\Title' );
-}
-
-if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
-	class_alias( '\Config', '\MediaWiki\Config\Config' );
-} elseif ( class_exists( '\MediaWiki\Config\Config' ) && !class_exists( '\Config' ) ) {
-	class_alias( '\MediaWiki\Config\Config', '\Config' );
-}
-
-if ( class_exists( '\RequestContext' ) && !class_exists( '\MediaWiki\Context\RequestContext' ) ) {
-	class_alias( '\RequestContext', '\MediaWiki\Context\RequestContext' );
-} elseif ( class_exists( '\MediaWiki\Context\RequestContext' ) && !class_exists( '\RequestContext' ) ) {
-	class_alias( '\MediaWiki\Context\RequestContext', '\RequestContext' );
-}
-// === End of Compatibility for MediaWiki 1.39 ===
-
 use MediaWiki\Block\DatabaseBlock;
 use MediaWiki\Config\Config;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
 use Wikimedia\IPUtils;
 
 class Hooks {
 	/** @var Config */
-	private $config;
+	private Config $config;
 
 	/**
 	 * Constructor of Hooks
+	 * @param Config $config main config
 	 */
-	public function __construct() {
-		$this->config = MediaWikiServices::getInstance()->getMainConfig();
+	public function __construct( Config $config ) {
+		$this->config = $config;
 	}
 
 	/**
@@ -271,7 +245,7 @@ class Hooks {
 	 * @param User $user
 	 * @return bool|string IP address or false
 	 */
-	private static function getIPFromUser( $user ) {
+	private static function getIPFromUser( User $user ) {
 		$context = RequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same
