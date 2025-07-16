@@ -42,7 +42,7 @@
       "value": 604800
     },
     "CrowdSecFallback": {
-      "description": "When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default to `ok`",
+      "description": "When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default/Invalid value to `ok`",
       "value": "ok"
     },
     "CrowdSecTreatTypesAsBan": {

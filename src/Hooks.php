@@ -116,14 +116,15 @@ class Hooks {
 				]
 			);
 			$fallback = $this->config->get( 'CrowdSecFallback' );
-			if ( $fallback === 'ok' ) {
-				return true;
-			} elseif ( $fallback === 'ban' ) {
+			if ( $fallback === 'ban' ) {
 				// Treat as ban for fallback
 				$lapiResult = 'ban';
 			} elseif ( $fallback === 'captcha' ) {
 				// Treat as captcha for fallback
 				$lapiResult = 'captcha';
+			} else {
+				// Treat as ok for fallback
+				$lapiResult = 'ok';
 			}
 		}
 
