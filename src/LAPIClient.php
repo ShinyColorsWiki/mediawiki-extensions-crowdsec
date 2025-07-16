@@ -184,7 +184,7 @@ class LAPIClient {
 
 		// phpunit
 		if ( defined( 'PHPUNIT_COMPOSER_INSTALL' ) ) {
-			fwrite( STDERR, $error );
+			fwrite( STDERR, $info );
 		}
 
 		$this->logger->error( 'Unable to validate response: {error}', [ 'error' => $error ] );
@@ -197,7 +197,7 @@ class LAPIClient {
 	private function logDebug( $info ): void {
 		// phpunit
 		if ( defined( 'PHPUNIT_COMPOSER_INSTALL' ) ) {
-			fwrite( STDERR, $error );
+			fwrite( STDERR, $info );
 		}
 
 		$this->logger->debug( $info );
