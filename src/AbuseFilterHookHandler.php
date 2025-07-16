@@ -2,13 +2,28 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-// use MediaWiki\Config\Config;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
-// use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
-// use MediaWiki\RecentChanges\RecentChange;
-// use MediaWiki\User\User;
+
+// === Compatibility for MediaWiki 1.39 ===
+if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
+	class_alias( '\Config', '\MediaWiki\Config\Config' );
+}
+
+if ( class_exists( '\Title' ) && !class_exists( '\MediaWiki\Title\Title' ) ) {
+	class_alias( '\Title', '\MediaWiki\Title\Title' );
+}
+
+if ( class_exists( '\RecentChange' ) && !class_exists( '\MediaWiki\RecentChanges\RecentChange' ) ) {
+	class_alias( '\RecentChange', '\MediaWiki\RecentChanges\RecentChange' );
+}
+// === End of Compatibility for MediaWiki 1.39 ===
+
+use MediaWiki\Config\Config;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
+use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
+use MediaWiki\RecentChanges\RecentChange;
+use MediaWiki\User\User;
 
 class AbuseFilterHookHandler implements
 	AbuseFilterBuilderHook,

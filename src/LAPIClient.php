@@ -20,13 +20,38 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-// use MediaWiki\Cache\ObjectCache;
-// use MediaWiki\Config\Config;
-// use MediaWiki\Context\RequestContext;
-// use Mediawiki\Json\FormatJson;
-// use MediaWiki\Logger\LoggerFactory;
-// use MediaWiki\MediaWikiServices;
-// use MediaWiki\Status\Status;
+// === Compatibility for MediaWiki 1.39 ===
+// if ( class_exists( '\BagOStuff' ) && !class_exists( '\MediaWiki\Cache\BagOStuff' ) ) {
+// 	class_alias( '\BagOStuff', '\MediaWiki\Cache\BagOStuff' );
+// }
+if ( class_exists( '\ObjectCache' ) && !class_exists( '\MediaWiki\Cache\ObjectCache' ) ) {
+	class_alias( '\ObjectCache', '\MediaWiki\Cache\ObjectCache' );
+}
+
+if ( class_exists( '\Status' ) && !class_exists( '\MediaWiki\Status\Status' ) ) {
+	class_alias( '\Status', '\MediaWiki\Status\Status' );
+}
+
+if ( class_exists( '\FormatJson' ) && !class_exists( '\Mediawiki\Json\FormatJson' ) ) {
+	class_alias( '\FormatJson', '\Mediawiki\Json\FormatJson' );
+}
+
+if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
+	class_alias( '\Config', '\MediaWiki\Config\Config' );
+}
+
+if ( class_exists( '\RequestContext' ) && !class_exists( '\MediaWiki\Context\RequestContext' ) ) {
+	class_alias( '\RequestContext', '\MediaWiki\Context\RequestContext' );
+}
+// === End of Compatibility for MediaWiki 1.39 ===
+
+use MediaWiki\Cache\ObjectCache;
+use MediaWiki\Config\Config;
+use MediaWiki\Context\RequestContext;
+use Mediawiki\Json\FormatJson;
+use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Status\Status;
 
 class LAPIClient {
 	/** @var mixed */
