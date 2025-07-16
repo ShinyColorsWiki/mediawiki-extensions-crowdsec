@@ -31,7 +31,7 @@ use Wikimedia\IPUtils;
 
 class Hooks {
 	/** @var Config */
-	private Config $config;
+	private $config;
 
 	/**
 	 * Constructor of Hooks
