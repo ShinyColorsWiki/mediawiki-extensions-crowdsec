@@ -12,12 +12,12 @@ jobs:
   linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: '8.1'
-            tools: composer:v2
-      - uses: actions/cache@v2
+          php-version: "8.3"
+          tools: composer
+      - uses: actions/cache@v4
         with:
           path: ~/.composer/cache
           key: composer-cache
@@ -28,15 +28,15 @@ jobs:
   phan:
     runs-on: ubuntu-latest
     env:
-      branch: REL1_39
+      branch: master
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: '7.4'
-            extensions: ast
-            tools: composer:v2
-      - uses: actions/cache@v2
+          php-version: "8.3"
+          extensions: ast
+          tools: composer
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.composer/cache
@@ -59,22 +59,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.4]
-        branch: [REL1_35]
-        mockhttptrait: [false]
-        include: # Test will fail since 1.36. See https://phabricator.wikimedia.org/T265628
-          - php: 7.4
-            branch: REL1_38
-            mockhttptrait: true
-          - php: 8.0
-            branch: REL1_39
-            mockhttptrait: true
-          - php: 8.1
-            branch: REL1_39
-            mockhttptrait: true
+        php: [8.0, 8.1, 8.2, 8.3]
+        mw-branch: [REL1_39, REL1_40, REL1_41, REL1_42, REL1_43, REL1_44]
     env:
       USE_MOCK: 1
-      branch: ${{ matrix.branch }}
+      branch: ${{ matrix.mw-branch }}
     runs-on: ubuntu-latest
     services:
       memcached:
@@ -90,22 +79,30 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v4
+
+      # Setup cache
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.composer/cache
             buildcache
           key: buildcache-${{ env.branch }}-${{ hashFiles('**/no/files/need/to/invalidate/cache/for/now') }}
+
+      # Install CrowdSec
       - name: Install and run CrowdSec
         run: |
           curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh | sudo bash
           sudo apt-get install crowdsec
+
+      # Setup PHP
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: ${{ matrix.php }}
-            extensions: mbstring, intl, opcache, mysqli
-            tools: composer${{ env.branch != 'REL1_39' && ':v1' || '' }}
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, intl, opcache, mysqli
+          tools: composer
+
+      # Setup MediaWiki
       - name: (debug) Print "php -i"
         run: php -i
       - uses: edwardspec/github-action-build-mediawiki@v1
@@ -118,6 +115,8 @@ jobs:
           cd mediawiki
           cp extensions/CrowdSec/tests/travis/composer.local.json . && composer update
           echo '{{CURRENTVERSION}}' | php maintenance/parse.php
+
+      # Setup CS Cli Test
       - name: Setup CS Cli Test
         run: |
           sudo cscli bouncers add test -k TestKey1
@@ -125,8 +124,9 @@ jobs:
           sudo cscli decisions add --ip 127.0.0.2 --type captcha
           curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.1" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
           curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.2" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
+
+      # RUN -- phpunit
       - name: RUN -- phpunit
-        continue-on-error: ${{ matrix.mockhttptrait }}
         run: |
           cd mediawiki
           php tests/phpunit/phpunit.php extensions/CrowdSec/tests/phpunit/
