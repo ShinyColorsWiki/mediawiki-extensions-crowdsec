@@ -69,7 +69,7 @@ class LAPIClient {
 	/**
 	 * Constructor of LAPIClient
 	 * @param MediaWiki\Config\Config $config main config
-	 * @param ?MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
+	 * @param ?MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
