@@ -46,6 +46,7 @@ class Hooks {
 	/**
 	 * Constructor of Hooks
 	 * @param MediaWiki\Config\Config $config main config
+	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory ) {
 		$this->config = $config;
