@@ -20,7 +20,7 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-// use MediaWiki\MediaWikiServices;
+use MediaWiki\MediaWikiServices;
 
 /**
  * CrowdSec 확장을 위한 통계 유틸리티 클래스.
@@ -29,14 +29,15 @@ class StatsUtil {
 	/** @var StatsUtil|null */
 	private static $instance = null;
 
-	/** @var \MediaWiki\Metrics\MetricsFactory */
+	/** @var MediaWiki\Metrics\MetricsFactory */
 	private $statsFactory;
 
 	/**
 	 * private 생성자.
+	 * @param MediaWiki\Metrics\MetricsFactory $statsFactory
 	 */
-	private function __construct() {
-		$this->statsFactory = MediaWikiServices::getInstance()->getStatsFactory()->withComponent( 'CrowdSec' );
+	private function __construct( $statsFactory ) {
+		$this->statsFactory = $statsFactory;
 	}
 
 	/**
@@ -45,7 +46,20 @@ class StatsUtil {
 	 */
 	public static function singleton(): StatsUtil {
 		if ( self::$instance === null ) {
-			self::$instance = new self();
+			$service = MediaWikiServices::getInstance();
+			// check if getStatsFactory method exists (since MW1.40)
+			if ( method_exists( $service, 'getStatsFactory' ) ) {
+				$sf = $service->getStatsFactory();
+				// check if withComponent method exists (since MW1.41)
+				if ( method_exists( $sf, 'withComponent' ) ) {
+					self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
+				}
+			}
+
+			// This will be MW 1.40 and older
+			if ( self::$instance === null ) {
+				self::$instance = new self( null );
+			}
 		}
 		return self::$instance;
 	}
@@ -55,6 +69,9 @@ class StatsUtil {
 	 * @param string $context 컨텍스트 (선택적)
 	 */
 	public function incrementDecisionQuery( string $context = '' ) {
+		if ( $this->statsFactory === null ) {
+			return;
+		}
 		$counter = $this->statsFactory->getCounter( 'decision_queries_total' );
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
@@ -67,6 +84,9 @@ class StatsUtil {
 	 * @param string $context 컨텍스트 (선택적)
 	 */
 	public function incrementLAPIError( string $context = '' ) {
+		if ( $this->statsFactory === null ) {
+			return;
+		}
 		$counter = $this->statsFactory->getCounter( 'lapi_errors_total' );
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
@@ -80,6 +100,9 @@ class StatsUtil {
 	 * @param string $context 컨텍스트 (선택적)
 	 */
 	public function incrementReportOnly( string $type, string $context = '' ) {
+		if ( $this->statsFactory === null ) {
+			return;
+		}
 		$counter = $this->statsFactory->getCounter( 'report_only_total' )
 			->setLabel( 'type', $type );
 		if ( $context ) {
@@ -94,6 +117,9 @@ class StatsUtil {
 	 * @param string $context 컨텍스트 (선택적)
 	 */
 	public function incrementBlock( string $type, string $context = '' ) {
+		if ( $this->statsFactory === null ) {
+			return;
+		}
 		$counter = $this->statsFactory->getCounter( 'blocks_total' )
 			->setLabel( 'type', $type );
 		if ( $context ) {

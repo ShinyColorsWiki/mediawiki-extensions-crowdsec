@@ -1,56 +1,70 @@
 # [CrowdSec Extension](https://www.mediawiki.org/wiki/Extension:CrowdSec)
-This extension is does a job for [CrowdSec](https://crowdsec.net) bouncer for mediawiki.
+This extension serves as a CrowdSec bouncer for MediaWiki.
 
-## Note
+## Notes
 ### **This extension is highly experimental. Use at your own risk.**
- * There's no challenge method. You can block the 'captcha' type using `$wgCrowdSecTreatTypesAsBan`.
-    - Recommended to use with [ConfirmEdit](https://www.mediawiki.org/wiki/Extension:ConfirmEdit). It blocks some kind of things.
- * This extension is tested on Mediawiki 1.43. Minimum required version is **1.41+**
+- There is no challenge method implemented. You can treat 'captcha' decisions as bans using `$wgCrowdSecTreatTypesAsBan`.
+  - Still recommended to use [ConfirmEdit](https://www.mediawiki.org/wiki/Extension:ConfirmEdit) as it won't block all malicious actors.
+- This extension has been tested on MediaWiki 1.43. The minimum required version is **1.39+**. It may work on older versions.
 
 ## Configuration 
-in `LocalSettings.php`
+Add to your `LocalSettings.php`:
 ```php
-wfLoadExtension( 'CrowdSec' ); // Load Extension
+// Load the extension
+wfLoadExtension( 'CrowdSec' );
 
-$wgCrowdSecEnable = true; // Set false to disable
+// Enable the extension (set to false to disable)
+$wgCrowdSecEnable = true;
 
-$wgCrowdSecAPIUrl = "http://localhost:8080"; // your crowdsec lapi address
-$wgCrowdSecAPIKey = ""; // !mandatory! Set your bouncer key from cscli. eg. `cscli bouncers add mediawiki-bouncer`
+// Your CrowdSec LAPI address
+$wgCrowdSecAPIUrl = &quot;http://localhost:8080&quot;;
 
-$wgCrowdSecCache = true; // Recommended to use this for perfomance.
-$wgCrowdSecCacheTTL = 604800; // Cache TTL. In seconds. Default to 7 days but it's nice to set 2 hours if can handle it. (2 hours is default CAPI pull interval)
+// Mandatory: Set your bouncer key from cscli, e.g., `cscli bouncers add mediawiki-bouncer`
+$wgCrowdSecAPIKey = &quot;&quot;;
 
-$wgCrowdSecFallback = 'ok'; // When LAPI throws error, decide what to do. `ban`, `captcha` or `ok` to do. Default/Invalid value to `ok`
-$wgCrowdSecRestrictRead = false; // Use at your own risk. This will block the site at all who listed on CrowdSec
-$wgCrowdSecTreatTypesAsBan = []; // Use at your own risk. Since there's no challenge integration, `captcha` will be passed too(Use ConfirmEdit instead). If you want to block `captcha` type user, then add `"captcha"` to this array.
+// Recommended for performance
+$wgCrowdSecCache = true;
 
-$wgCrowdSecReportOnly = false; // This Doesn't block the user. for debug purpose.
+// Cache TTL in seconds. Defaults to 7 days, but consider setting to 2 hours (default CAPI pull interval) if possible
+$wgCrowdSecCacheTTL = 604800;
 
-// Debug purpose
-#$wgDebugLogGroups['CrowdSec'] = '/var/log/mediawiki/crowdsec.log'; // Hooks
-#$wgDebugLogGroups['CrowdSecLocalAPI'] = '/var/log/mediawiki/crowdsec.log'; // LAPIClient
+// Fallback action when LAPI throws an error: 'ban', 'captcha', or 'ok'. Default is 'ok'
+$wgCrowdSecFallback = 'ok';
+
+// Use at your own risk: Blocks all access for users listed in CrowdSec
+$wgCrowdSecRestrictRead = false;
+
+// Use at your own risk: Treat specified decision types as bans. Since there is no challenge integration, 'captcha' decisions are passed by default (use ConfirmEdit instead). To block 'captcha', add &quot;captcha&quot; to this array.
+$wgCrowdSecTreatTypesAsBan = [];
+
+// Report only mode: Does not block users, for debugging purposes
+$wgCrowdSecReportOnly = false;
+
+// For debugging:
+// $wgDebugLogGroups['CrowdSec'] = '/var/log/mediawiki/crowdsec.log'; // Hooks
+// $wgDebugLogGroups['CrowdSecLocalAPI'] = '/var/log/mediawiki/crowdsec.log'; // LAPIClient
 ```
 
-You should setup CrowdSec and CrowdSec LAPI, Configurations too.
-Also highly recommend to register CAPI(Central API) for pull blocklist from central.
+You should also set up CrowdSec, the CrowdSec LAPI (Local API), and their configurations.
+It is highly recommended to register with the CAPI (Central API) to pull blocklists from the central repository.
 
-## User rights
-* `crowdsec-bypass`: allows users to bypass crowdsec check.
+## User Rights
+- `crowdsec-bypass`: Allows users to bypass the CrowdSec check.
 
-## AbuseFilter
-There's [AbuseFilter](https://www.mediawiki.org/wiki/Extension:AbuseFilter) integration. The variable `crowdsec_blocked` is representing...
-* `false`: LAPI Request was failed. or failed to get user ip.
-* `ok`: This user is ok to process.
-* `ban`: This user is reported for "ban" from LAPI.
-* ... and various (custom) types via CrowdSec. including `captcha`.
+## AbuseFilter Integration
+This extension integrates with [AbuseFilter](https://www.mediawiki.org/wiki/Extension:AbuseFilter). The variable `crowdsec_decision` represents the CrowdSec decision:
+- `ok`: The user is allowed to proceed.
+- `ban`: The user is banned according to LAPI.
+- `error`: The LAPI request failed, or failed to retrieve the user's IP.
+- ... and various (custom) types from CrowdSec, including `captcha`.
 
 ## Thanks
-* main method for block user is based on [StopForumSpam Extension](https://mediawiki.org/wiki/Extension:StopForumSpam).
-* Cache method is based on [AWS Extension](https://github.com/edwardspec/mediawiki-aws-s3)
-* [CrowdSec](https://crowdsec.net) itself.
+- The main method for blocking users is based on the [StopForumSpam Extension](https://mediawiki.org/wiki/Extension:StopForumSpam).
+- The caching method is based on the [AWS Extension](https://github.com/edwardspec/mediawiki-aws-s3).
+- [CrowdSec](https://crowdsec.net) itself.
 
-## Development setup
-1. install nodejs, npm, and PHP composer
-2. change to the extension's directory
-3. `npm install`
-4. `composer install`
+## Development Setup
+1. Install Node.js, npm, and PHP Composer.
+2. Change to the extension's directory.
+3. Run `npm install`.
+4. Run `composer install`.

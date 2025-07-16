@@ -2,27 +2,24 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-// use MediaWiki\Config\Config;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
-// use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
-// use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
-// use MediaWiki\RecentChanges\RecentChange;
-// use MediaWiki\User\User;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
+use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
+use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
 
 class AbuseFilterHookHandler implements
 	AbuseFilterBuilderHook,
 	AbuseFilterComputeVariableHook,
 	AbuseFilterGenerateUserVarsHook
 {
-	/** @var Config */
-	private Config $config;
+	/** @var MediaWiki\Config\Config|null */
+	private $config;
 
 	/**
 	 * Constructor of AbuseFilterHookHandler
-	 * @param Config $config main config
+	 * @param MediaWiki\Config\Config $config main config
 	 */
-	public function __construct( Config $config ) {
+	public function __construct( $config ) {
 		$this->config = $config;
 	}
 
@@ -71,12 +68,12 @@ class AbuseFilterHookHandler implements
 	/**
 	 * Load our blocked variable
 	 * @param VariableHolder $vars
-	 * @param User $user
-	 * @param ?RecentChange $rc
+	 * @param MediaWiki\User\User $user
+	 * @param ?MediaWiki\RecentChanges\RecentChange $rc
 	 * @return bool
 	 */
     // phpcs:ignore
-	public function onAbuseFilter_generateUserVars( $vars, $user, ?RecentChange $rc ) {
+	public function onAbuseFilter_generateUserVars( $vars, $user, $rc ) {
 		if ( $this->isConfigOk() ) {
 			$vars->setLazyLoadVar( 'crowdsec_decision', 'crowdsec-decision', [ 'user' => $user ] );
 		}
