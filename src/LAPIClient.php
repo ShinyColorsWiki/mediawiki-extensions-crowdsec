@@ -58,24 +58,32 @@ class LAPIClient {
 	private $cache;
 	/** @var Psr\Log\LoggerInterface */
 	private $logger;
-	/** @var LAPIClient|null */
-	protected static $instance = null;
+	/** @var MediaWiki\Http\HttpRequestFactory */
+	private $httpRequestFactory;
 	/** @var MediaWiki\Config\Config|null */
 	private $config;
+
+	/** @var LAPIClient|null */
+	protected static $instance = null;
 
 	/**
 	 * Constructor of LAPIClient
 	 * @param MediaWiki\Config\Config $config main config
+	 * @param MediaWiki\Http\HttpRequestFactory $httpRequestFactory http request factory
 	 */
-	public function __construct( $config ) {
+	public function __construct( $config, $httpRequestFactory ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = MWObjectCache::getLocalClusterInstance();
 		$this->config = $config;
+		$this->httpRequestFactory = $httpRequestFactory;
 	}
 
 	public static function singleton() {
 		if ( self::$instance === null ) {
-			self::$instance = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
+			self::$instance = new LAPIClient(
+				MediaWikiServices::getInstance()->getMainConfig(),
+				MediaWikiServices::getInstance()->getHttpRequestFactory()
+ );
 		}
 
 		return self::$instance;
@@ -141,7 +149,7 @@ class LAPIClient {
 			'method' => 'GET',
 		];
 
-		$request = MediaWikiServices::getInstance()->getHttpRequestFactory()
+		$request = $this->httpRequestFactory
 			->create( $url, $options, __METHOD__ );
 		$request->setHeader( 'Accept', 'application/json' );
 		$request->setHeader( 'X-Api-Key', $apiKey );
@@ -188,11 +196,6 @@ class LAPIClient {
 			$error = $info;
 		}
 
-		// phpunit
-		if ( defined( 'PHPUNIT_COMPOSER_INSTALL' ) ) {
-			fwrite( STDERR, $info );
-		}
-
 		$this->logger->error( 'Unable to validate response: {error}', [ 'error' => $error ] );
 	}
 
@@ -201,11 +204,6 @@ class LAPIClient {
 	 * @param mixed $info
 	 */
 	private function logDebug( $info ): void {
-		// phpunit
-		if ( defined( 'PHPUNIT_COMPOSER_INSTALL' ) ) {
-			fwrite( STDERR, $info );
-		}
-
 		$this->logger->debug( $info );
 	}
 
@@ -214,11 +212,6 @@ class LAPIClient {
 	 * @param mixed $info
 	 */
 	private function logInfo( $info ): void {
-		// phpunit
-		if ( defined( 'PHPUNIT_COMPOSER_INSTALL' ) ) {
-			fwrite( STDERR, $info );
-		}
-
 		$this->logger->info( $info );
 	}
 

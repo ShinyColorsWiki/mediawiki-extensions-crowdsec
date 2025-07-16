@@ -21,12 +21,13 @@
 namespace MediaWiki\Extension\CrowdSec\Tests;
 
 use MediaWiki\Extension\CrowdSec\LAPIClient;
+use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\MediaWikiServices;
 
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
-class DecisionTest extends \ApiTestCase {
+class DecisionTest extends \MediaWikiIntegrationTestCase {
 	use \MockHttpTrait;
 
 	protected function setUp(): void {
@@ -46,29 +47,28 @@ class DecisionTest extends \ApiTestCase {
 	 * @param string $ip The IP address to ban.
 	 * @param string $type The type of decision to return.
 	 */
-	protected function setupDecision( string $ip, string $type ) {
-		if ( $type === "ok" ) {
-			$this->installMockHttp(
-				$this->makeFakeHttpRequest( '' )
-			);
-			return;
-		}
+	protected function getDecisionClient( $ip, $decision ) {
+		$expectedResponse = $decision === "ok" ? '' : json_encode( [
+			[
+				'id' => 1,
+				'origin' => 'test',
+				'type' => $decision,
+				'scope' => 'Ip',
+				'value' => $ip,
+				'duration' => "4h0m0s",
+				'scenario' => 'test',
+			]
+		], JSON_UNESCAPED_SLASHES );
 
-		$this->installMockHttp(
-			$this->makeFakeHttpRequest( json_encode( [
-					[
-						'id' => 1,
-						'origin' => 'test',
-						'type' => $type,
-						'scope' => 'Ip',
-						'value' => $ip,
-						'duration' => "4h0m0s",
-						'scenario' => 'test',
-						'simulated' => true,
-					]
-				], JSON_UNESCAPED_SLASHES ),
-			)
-		);
+		$mockHttpRequestFactory = $this->createMock( HttpRequestFactory::class );
+		$mockHttpRequest = $this->createMock( \MWHttpRequest::class );
+		$mockHttpRequest->method( 'setHeader' )->willReturn( $mockHttpRequest );
+		$mockHttpRequest->expects( $this->once() )->method( 'execute' )->willReturn( Status::newGood() );
+		$mockHttpRequest->expects( $this->once() )->method( 'getContent' )->willReturn( $expectedResponse );
+		$mockHttpRequest->expects( $this->once() )->method( 'getStatus' )->willReturn( Status::newGood() );
+		$mockHttpRequestFactory->method( 'create' )->willReturn( $mockHttpRequest );
+
+		return new LAPIClient( MediaWikiServices::getInstance()->getMainConfig(), $mockHttpRequestFactory );
 	}
 
 	/**
