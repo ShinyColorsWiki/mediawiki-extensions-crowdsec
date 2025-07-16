@@ -68,17 +68,17 @@
     "AbuseFilter-computeVariable": "abusefilter",
     "AbuseFilter-generateUserVars": "abusefilter",
     "AbuseFilter-builder": "abusefilter",
-    "getUserPermissionsErrorsExpensive": "hooks",
+    "getUserPermissionsErrors": "hooks",
     "OtherBlockLogLink": "hooks"
   },
   "HookHandlers": {
     "abusefilter": {
       "class": "MediaWiki\\Extension\\CrowdSec\\AbuseFilterHookHandler",
-      "services": ["MainConfig"]
+      "services": ["MainConfig", "HttpRequestFactory"]
     },
     "hooks": {
       "class": "MediaWiki\\Extension\\CrowdSec\\Hooks",
-      "services": ["MainConfig"]
+      "services": ["MainConfig", "HttpRequestFactory"]
     }
   },
   "MessagesDirs": {

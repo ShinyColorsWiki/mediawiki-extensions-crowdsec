@@ -63,6 +63,39 @@ class Hooks {
 		$this->lapiClient = new LAPIClient( $config, $this->httpRequestFactory );
 	}
 
+	// /**
+	//  * @deprecated Use onGetUserPermissionsErrors instead
+	//  * Check if the user is blocked. (only 'expensive' action)
+	//  * If the user is blocked, return false.
+	//  * If the user is not blocked, return true.
+	//  *
+	//  * @param MediaWiki\Title\Title &$title Title being acted upon
+	//  * @param MediaWiki\User\User &$user User performing the action
+	//  * @param string $action Action being performed
+	//  * @param array &$result Will be filled with block status if blocked
+	//  * @return bool
+	//  */
+	// public function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
+	// 	return $this->onGetUserPermissionsErrorsCallback( $title, $user, $action, $result );
+	// }
+
+	/**
+	 * Check if the user is blocked. (also read action)
+	 * If the user is blocked, return false.
+	 * If the user is not blocked, return true.
+	 *
+	 * @param MediaWiki\Title\Title &$title Title being acted upon
+	 * @param MediaWiki\User\User &$user User performing the action
+	 * @param string $action Action being performed
+	 */
+	public function onGetUserPermissionsErrors( &$title, &$user, $action, &$result ) {
+		// if ( $action === 'read' && $this->config->get( 'CrowdSecRestrictRead' ) ) {
+		// 	return $this->onGetUserPermissionsErrorsCallback( $title, $user, $action, $result );
+		// }
+		// return true;
+		return $this->onGetUserPermissionsErrorsCallback( $title, $user, $action, $result );
+	}
+
 	/**
 	 * If an IP address is denylisted, don't let them edit.
 	 *
@@ -72,7 +105,7 @@ class Hooks {
 	 * @param array &$result Will be filled with block status if blocked
 	 * @return bool
 	 */
-	public function onGetUserPermissionsErrorsExpensive( &$title, &$user, $action, &$result ) {
+	private function onGetUserPermissionsErrorsCallback( &$title, &$user, $action, &$result ) {
 		if ( !$this->isConfigOk() ) {
 			// Not configured
 			return true;
@@ -81,6 +114,7 @@ class Hooks {
 		if ( $action === 'read' && !$this->config->get( 'CrowdSecRestrictRead' ) ) {
 			return true;
 		}
+
 		if ( $this->config->get( 'BlockAllowsUTEdit' ) && $title->equals( $user->getTalkPage() ) ) {
 			// Let a user edit their talk page
 			return true;

@@ -6,6 +6,7 @@ use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterBuilderHook;
 use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterComputeVariableHook;
 use MediaWiki\Extension\AbuseFilter\Hooks\AbuseFilterGenerateUserVarsHook;
 use MediaWiki\Extension\AbuseFilter\Variables\VariableHolder;
+use MediaWiki\MediaWikiServices;
 
 class AbuseFilterHookHandler implements
 	AbuseFilterBuilderHook,
@@ -15,12 +16,25 @@ class AbuseFilterHookHandler implements
 	/** @var MediaWiki\Config\Config|null */
 	private $config;
 
+	/** @var MediaWiki\Http\HttpRequestFactory|null */
+	private $httpRequestFactory;
+
+	/** @var LAPIClient */
+	private $lapiClient;
+
 	/**
 	 * Constructor of AbuseFilterHookHandler
 	 * @param MediaWiki\Config\Config $config main config
+	 * @param MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
-	public function __construct( $config ) {
+	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->config = $config;
+		if ( $httpRequestFactory === null ) {
+			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
+		} else {
+			$this->httpRequestFactory = $httpRequestFactory;
+		}
+		$this->lapiClient = new LAPIClient( $config, $this->httpRequestFactory );
 	}
 
 	/**
@@ -51,7 +65,7 @@ class AbuseFilterHookHandler implements
 			if ( $ip === false ) {
 				$result = 'unknown';
 			} else {
-				$decision = LAPIClient::singleton()->getDecision( $ip );
+				$decision = $this->lapiClient->getDecision( $ip );
 				StatsUtil::singleton()->incrementDecisionQuery( 'abusefilter' );
 				if ( $decision === false ) {
 					StatsUtil::singleton()->incrementLAPIError( 'abusefilter' );
