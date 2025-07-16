@@ -46,11 +46,18 @@ class StatsUtil {
 	 */
 	public static function singleton(): StatsUtil {
 		if ( self::$instance === null ) {
-			try {
-				$sf = MediaWikiServices::getInstance()->getStatsFactory();
-				self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
-			} catch ( \Exception $e ) {
-				// It is supported since MediaWiki 1.41+
+			$service = MediaWikiServices::getInstance();
+			// check if getStatsFactory method exists (since MW1.40)
+			if ( method_exists( $service, 'getStatsFactory' ) ) {
+				$sf = $service->getStatsFactory();
+				// check if withComponent method exists (since MW1.41)
+				if ( method_exists( $sf, 'withComponent' ) ) {
+					self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
+				} 
+			}
+
+            // This will be MW 1.40 and older
+			if ( self::$instance === null ) {
 				self::$instance = new self( null );
 			}
 		}
