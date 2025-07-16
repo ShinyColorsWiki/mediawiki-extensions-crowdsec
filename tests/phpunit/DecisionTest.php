@@ -26,8 +26,19 @@ use MediaWiki\MediaWikiServices;
 /**
  * @coversDefaultClass \MediaWiki\Extension\CrowdSec
  */
-class DecisionTest extends \MediaWikiIntegrationTestCase {
+class DecisionTest extends \ApiTestCase {
 	use \MockHttpTrait;
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->setMwGlobals( [
+			'CrowdSecEnabled' => true,
+			'CrowdSecAPIKey' => 'TestKey1',
+			'CrowdSecCache' => false,
+			'CrowdSecReportOnly' => false,
+		] );
+	}
 
 	/**
 	 * Setup a mock HTTP response for a ban decision.
@@ -65,10 +76,11 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 */
 	public function testBanDecision() {
 		$decision = "ban";
-		$this->setupDecision( "127.0.0.1", $decision );
+		$ip = "127.0.0.1";
+		$this->setupDecision( $ip, $decision );
 
 		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
-		$this->assertSame( $client->getDecision( "127.0.0.1" ), $decision );
+		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 
 	/**
@@ -76,10 +88,11 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 */
 	public function testCaptchaDecision() {
 		$decision = "captcha";
-		$this->setupDecision( "127.0.0.2", $decision );
+		$ip = "127.0.0.2";
+		$this->setupDecision( $ip, $decision );
 
 		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
-		$this->assertSame( $client->getDecision( "127.0.0.2" ), $decision );
+		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 
 	/**
@@ -87,9 +100,10 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 */
 	public function testOkDecision() {
 		$decision = "ok";
-		$this->setupDecision( "127.0.0.3", $decision );
+		$ip = "127.0.0.3";
+		$this->setupDecision( $ip, $decision );
 
 		$client = new LAPIClient( MediaWikiServices::getInstance()->getMainConfig() );
-		$this->assertSame( $client->getDecision( "127.0.0.3" ), $decision );
+		$this->assertSame( $client->getDecision( $ip ), $decision );
 	}
 }
