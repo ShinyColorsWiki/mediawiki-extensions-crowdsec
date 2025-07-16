@@ -20,12 +20,13 @@
 
 namespace MediaWiki\Extension\CrowdSec;
 
-use FormatJson;
+use MediaWiki\Cache\ObjectCache;
+use MediaWiki\Config\Config;
+use MediaWiki\Context\RequestContext;
+use Mediawiki\Json\FormatJson;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
-use ObjectCache;
-use RequestContext;
-use Status;
+use MediaWiki\Status\Status;
 
 class LAPIClient {
 	/** @var mixed */
@@ -36,10 +37,12 @@ class LAPIClient {
 	private $logger;
 	/** @var LAPIClient|null */
 	protected static $instance = null;
+	/** @var Config */
 
 	public function __construct() {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
 		$this->cache = ObjectCache::getLocalClusterInstance();
+		$this->config = MediaWikiServices::getInstance()->getMainConfig();
 	}
 
 	public static function singleton() {
@@ -69,8 +72,9 @@ class LAPIClient {
 	 * @return string
 	 */
 	public function getDecision( string $ip ) {
-		global $wgCrowdSecCache, $wgCrowdSecCacheTTL;
-		if ( !$wgCrowdSecCache ) {
+		$cacheEnabled = $this->config->get( 'CrowdSecCache' );
+		$cacheTTL = $this->config->get( 'CrowdSecCacheTTL' );
+		if ( !$cacheEnabled ) {
 			$result = $this->requestDecision( $ip );
 
 			$this->logDebug( __METHOD__ . ': [no cache] The result of IP "' . $ip . '" is "' . $result . '".' );
@@ -83,7 +87,7 @@ class LAPIClient {
 		if ( $result === false ) {
 			$this->logDebug( __METHOD__ . ': The IP "' . $ip . '" wasn\'t found on cache. request decision.' );
 			$result = $this->requestDecision( $ip );
-			$this->cache->set( $cacheKey, $result, $wgCrowdSecCacheTTL );
+			$this->cache->set( $cacheKey, $result, $cacheTTL );
 		}
 
 		$this->logDebug( __METHOD__ . ': The result of IP "' . $ip . '" is "' . $result . '".' );
@@ -96,11 +100,12 @@ class LAPIClient {
 	 * @return string
 	 */
 	private function requestDecision( string $ip ) {
-		global $wgCrowdSecAPIKey, $wgCrowdSecAPIUrl;
+		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
+		$apiUrl = $this->config->get( 'CrowdSecAPIUrl' );
 
 		$webRequest = RequestContext::getMain()->getRequest();
 
-		$url = self::apiUrlHandler( $wgCrowdSecAPIUrl ) . 'v1/decisions?scope=ip&ip=' . $ip;
+		$url = self::apiUrlHandler( $apiUrl ) . 'v1/decisions?scope=ip&ip=' . $ip;
 		$options = [
 			'method' => 'GET',
 		];
@@ -108,7 +113,7 @@ class LAPIClient {
 		$request = MediaWikiServices::getInstance()->getHttpRequestFactory()
 			->create( $url, $options, __METHOD__ );
 		$request->setHeader( 'Accept', 'application/json' );
-		$request->setHeader( 'X-Api-Key', $wgCrowdSecAPIKey );
+		$request->setHeader( 'X-Api-Key', $apiKey );
 
 		$status = $request->execute();
 		if ( !$status->isOK() ) {
