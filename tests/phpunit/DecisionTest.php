@@ -56,7 +56,7 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 						'simulated' => true,
 					]
 				], JSON_UNESCAPED_SLASHES ),
-			);
+			)
 		);
 	}
 
