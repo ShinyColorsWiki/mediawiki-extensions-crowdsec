@@ -76,6 +76,7 @@ class ClientDecisionTest extends \MediaWikiIntegrationTestCase {
 		$mockHttpRequestFactory->method( 'create' )->willReturn( $mockHttpRequest );
 
 		$this->setService( 'HttpRequestFactory', $mockHttpRequestFactory );
+		$this->redefineService( 'HttpRequestFactory', $mockHttpRequestFactory );
 
 		return new LAPIClient( MediaWikiServices::getInstance()->getMainConfig(), $mockHttpRequestFactory );
 	}
