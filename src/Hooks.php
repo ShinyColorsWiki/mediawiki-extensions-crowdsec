@@ -21,28 +21,28 @@
 namespace MediaWiki\Extension\CrowdSec;
 
 // === Compatibility for MediaWiki 1.39 ===
-if ( class_exists( '\User' ) && !class_exists( '\MediaWiki\User\User' ) ) {
-	class_alias( '\User', '\MediaWiki\User\User' );
+if ( class_exists( 'User' ) && !class_exists( 'MediaWiki\User\User' ) ) {
+	class_alias( 'User', 'MediaWiki\User\User' );
 }
 
-if ( class_exists( '\Title' ) && !class_exists( '\MediaWiki\Title\Title' ) ) {
-	class_alias( '\Title', '\MediaWiki\Title\Title' );
+if ( class_exists( 'Title' ) && !class_exists( 'MediaWiki\Title\Title' ) ) {
+	class_alias( 'Title', 'MediaWiki\Title\Title' );
 }
 
-if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
-	class_alias( '\Config', '\MediaWiki\Config\Config' );
+if ( class_exists( 'Config' ) && !class_exists( 'MediaWiki\Config\Config' ) ) {
+	class_alias( 'Config', 'MediaWiki\Config\Config' );
 }
 
-if ( class_exists( '\RequestContext' ) && !class_exists( '\MediaWiki\Context\RequestContext' ) ) {
-	class_alias( '\RequestContext', '\MediaWiki\Context\RequestContext' );
+if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\Context\RequestContext' ) ) {
+	class_alias( 'RequestContext', 'MediaWiki\Context\RequestContext' );
 }
 
-if ( class_exists( '\DatabaseBlock' ) && !class_exists( '\MediaWiki\Block\DatabaseBlock' ) ) {
-	class_alias( '\DatabaseBlock', '\MediaWiki\Block\DatabaseBlock' );
+if ( class_exists( 'DatabaseBlock' ) && !class_exists( 'MediaWiki\Block\DatabaseBlock' ) ) {
+	class_alias( 'DatabaseBlock', 'MediaWiki\Block\DatabaseBlock' );
 }
 
-if ( class_exists( '\Html' ) && !class_exists( '\MediaWiki\Html\Html' ) ) {
-	class_alias( '\Html', '\MediaWiki\Html\Html' );
+if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\Html\Html' ) ) {
+	class_alias( 'Html', 'MediaWiki\Html\Html' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 

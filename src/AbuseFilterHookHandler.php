@@ -3,16 +3,16 @@
 namespace MediaWiki\Extension\CrowdSec;
 
 // === Compatibility for MediaWiki 1.39 ===
-if ( class_exists( '\Config' ) && !class_exists( '\MediaWiki\Config\Config' ) ) {
-	class_alias( '\Config', '\MediaWiki\Config\Config' );
+if ( class_exists( 'Config' ) && !class_exists( 'MediaWiki\Config\Config' ) ) {
+	class_alias( 'Config', 'MediaWiki\Config\Config' );
 }
 
-if ( class_exists( '\Title' ) && !class_exists( '\MediaWiki\Title\Title' ) ) {
-	class_alias( '\Title', '\MediaWiki\Title\Title' );
+if ( class_exists( 'Title' ) && !class_exists( 'MediaWiki\Title\Title' ) ) {
+	class_alias( 'Title', 'MediaWiki\Title\Title' );
 }
 
-if ( class_exists( '\RecentChange' ) && !class_exists( '\MediaWiki\RecentChanges\RecentChange' ) ) {
-	class_alias( '\RecentChange', '\MediaWiki\RecentChanges\RecentChange' );
+if ( class_exists( 'RecentChange' ) && !class_exists( 'MediaWiki\RecentChanges\RecentChange' ) ) {
+	class_alias( 'RecentChange', 'MediaWiki\RecentChanges\RecentChange' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
 

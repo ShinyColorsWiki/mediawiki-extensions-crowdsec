@@ -29,12 +29,12 @@ class StatsUtil {
 	/** @var StatsUtil|null */
 	private static $instance = null;
 
-	/** @var \MediaWiki\Metrics\MetricsFactory */
+	/** @var MediaWiki\Metrics\MetricsFactory */
 	private $statsFactory;
 
 	/**
 	 * private 생성자.
-	 * @param \MediaWiki\Metrics\MetricsFactory $statsFactory
+	 * @param MediaWiki\Metrics\MetricsFactory $statsFactory
 	 */
 	private function __construct( $statsFactory ) {
 		$this->statsFactory = $statsFactory;
@@ -47,7 +47,8 @@ class StatsUtil {
 	public static function singleton(): StatsUtil {
 		if ( self::$instance === null ) {
 			try {
-				self::$instance = new self( MediaWikiServices::getInstance()->getStatsFactory()->withComponent( 'CrowdSec' ) );
+                $sf = MediaWikiServices::getInstance()->getStatsFactory();
+				self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
 			} catch ( \Exception $e ) {
 				// It is supported since MediaWiki 1.41+
 				self::$instance = new self( null );
