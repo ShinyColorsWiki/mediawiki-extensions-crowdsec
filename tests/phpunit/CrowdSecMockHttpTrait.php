@@ -29,22 +29,20 @@ trait CrowdSecMockHttpTrait {
 	 * Setup a mock HTTP response for a ban decision.
 	 *
 	 * @param string $ip The IP address to ban.
-	 * @param string $decision The decision to return.
+	 * @param string $type The type of decision to return.
 	 */
-	protected function setupBanDecision( string $ip, string $decision ) {
+	protected function setupBanDecision( string $ip, string $type ) {
 		$this->installMockHttp(
 			$this->makeFakeHttpMultiClient( [ [
 				'code' => 200,
 				'body' => FormatJson::encode( [
 					[
 						'id' => 1,
-						'uuid' => '00000000-0000-0000-0000-000000000000',
 						'origin' => 'test',
-						'type' => $decision,
-						'scope' => 'ip',
+						'type' => $type,
+						'scope' => 'Ip',
 						'value' => $ip,
-						'duration' => 3600,
-						'until' => time() + 3600,
+						'duration' => "4h0m0s",
 						'scenario' => 'test',
 						'simulated' => true,
 					]

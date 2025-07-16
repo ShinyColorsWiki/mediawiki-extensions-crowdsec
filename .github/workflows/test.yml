@@ -122,8 +122,18 @@ jobs:
           sudo cscli bouncers add test -k TestKey1
           sudo cscli decisions add --ip 127.0.0.1 --type ban
           sudo cscli decisions add --ip 127.0.0.2 --type captcha
-          curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.1" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
-          curl -X GET "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.2" -H  "accept: application/json" -H "x-api-key: TestKey1" -v
+
+          echo "Get decision for 127.0.0.1 - should be ban"
+          curl -s "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.1" -H "accept: application/json" -H "x-api-key: TestKey1"
+          echo ""
+
+          echo "Get decision for 127.0.0.2 - should be captcha"
+          curl -s "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.2" -H "accept: application/json" -H "x-api-key: TestKey1"
+          echo ""
+
+          echo "Get decision for 127.0.0.3 - should be empty"
+          curl -s "http://127.0.0.1:8080/v1/decisions?scope=ip&ip=127.0.0.3" -H "accept: application/json" -H "x-api-key: TestKey1"
+          echo ""
 
       # RUN -- phpunit
       - name: RUN -- phpunit
