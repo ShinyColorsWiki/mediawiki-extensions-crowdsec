@@ -53,10 +53,10 @@ class StatsUtil {
 				// check if withComponent method exists (since MW1.41)
 				if ( method_exists( $sf, 'withComponent' ) ) {
 					self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
-				} 
+				}
 			}
 
-            // This will be MW 1.40 and older
+			// This will be MW 1.40 and older
 			if ( self::$instance === null ) {
 				self::$instance = new self( null );
 			}
