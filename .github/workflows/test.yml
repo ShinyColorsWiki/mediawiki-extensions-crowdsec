@@ -142,4 +142,4 @@ jobs:
       - name: RUN -- phpunit
         run: |
           cd mediawiki
-          php tests/phpunit/phpunit.php extensions/CrowdSec/tests/phpunit/
+          composer phpunit:entrypoint -- extensions/CrowdSec/tests/phpunit/
