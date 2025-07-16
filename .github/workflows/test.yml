@@ -115,7 +115,7 @@ jobs:
         run: |
           rsync -a --exclude buildcache --exclude mediawiki --exclude .git . mediawiki/extensions/CrowdSec/
           cd mediawiki
-          cp extensions/CrowdSec/tests/travis/composer.local.json . && composer update
+          cp extensions/CrowdSec/tests/ci/composer.local.json . && composer update
           echo '{{CURRENTVERSION}}' | php maintenance/parse.php
 
       # Setup CS Cli Test
