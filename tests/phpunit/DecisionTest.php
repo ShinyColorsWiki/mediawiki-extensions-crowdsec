@@ -34,7 +34,17 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 * @param string $ip The IP address to ban.
 	 * @param string $type The type of decision to return.
 	 */
-	protected function setupBanDecision( string $ip, string $type ) {
+	protected function setupDecision( string $ip, string $type ) {
+		if ( $type === "ok" ) {
+			$this->installMockHttp(
+				$this->makeFakeHttpMultiClient( [ [
+					'code' => 200,
+					'body' => ''
+				] ] )
+			);
+			return;
+		}
+
 		$this->installMockHttp(
 			$this->makeFakeHttpMultiClient( [ [
 				'code' => 200,
@@ -58,29 +68,32 @@ class DecisionTest extends \MediaWikiIntegrationTestCase {
 	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
 	 */
 	public function testBanDecision() {
-		$this->setupBanDecision( "127.0.0.1", "ban" );
+		$decision = "ban";
+		$this->setupDecision( "127.0.0.1", $decision );
 
 		$client = new LAPIClient();
-		$this->assertSame( "ban", $client->getDecision( "127.0.0.1" ) );
+		$this->assertSame( $client->getDecision( "127.0.0.1" ), $decision );
 	}
 
 	/**
 	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
 	 */
 	public function testCaptchaDecision() {
-		$this->setupBanDecision( "127.0.0.2", "captcha" );
+		$decision = "captcha";
+		$this->setupDecision( "127.0.0.2", $decision );
 
 		$client = new LAPIClient();
-		$this->assertSame( "captcha", $client->getDecision( "127.0.0.2" ) );
+		$this->assertSame( $client->getDecision( "127.0.0.2" ), $decision );
 	}
 
 	/**
 	 * @covers \MediaWiki\Extension\CrowdSec\LAPIClient
 	 */
 	public function testOkDecision() {
-		$this->setupBanDecision( "127.0.0.3", "ok" );
+		$decision = "ok";
+		$this->setupDecision( "127.0.0.3", $decision );
 
 		$client = new LAPIClient();
-		$this->assertSame( "ok", $client->getDecision( "127.0.0.3" ) );
+		$this->assertSame( $client->getDecision( "127.0.0.3" ), $decision );
 	}
 }
