@@ -23,17 +23,14 @@ namespace MediaWiki\Extension\CrowdSec;
 use MediaWiki\MediaWikiServices;
 
 /**
- * CrowdSec 확장을 위한 통계 유틸리티 클래스.
+ * Stats utility class for CrowdSec extension.
  */
 class StatsUtil {
-	/** @var StatsUtil|null */
-	private static $instance = null;
-
 	/** @var MediaWiki\Metrics\MetricsFactory */
 	private $statsFactory;
 
 	/**
-	 * private 생성자.
+	 * private constructor.
 	 * @param MediaWiki\Metrics\MetricsFactory $statsFactory
 	 */
 	private function __construct( $statsFactory ) {
@@ -41,34 +38,33 @@ class StatsUtil {
 	}
 
 	/**
-	 * 싱글톤 인스턴스를 반환합니다.
+	 * Create a new instance and return it (__construct's alias).
+	 * @param MediaWiki\MediaWikiServices|null $service MediaWikiServices Instance
 	 * @return StatsUtil
 	 */
-	public static function singleton(): StatsUtil {
-		if ( self::$instance === null ) {
+	public static function create( $service = null ): StatsUtil {
+		if ( $service === null ) {
 			$service = MediaWikiServices::getInstance();
-			// check if getStatsFactory method exists (since MW1.40)
-			if ( method_exists( $service, 'getStatsFactory' ) ) {
-				$sf = $service->getStatsFactory();
-				// check if withComponent method exists (since MW1.41)
-				if ( method_exists( $sf, 'withComponent' ) ) {
-					self::$instance = new self( $sf->withComponent( 'CrowdSec' ) );
-				}
-			}
-
-			// This will be MW 1.40 and older
-			if ( self::$instance === null ) {
-				self::$instance = new self( null );
+		}
+		// MW 1.40 and above: check if getStatsFactory method exists
+		if ( method_exists( $service, 'getStatsFactory' ) ) {
+			$sf = $service->getStatsFactory();
+			// MW 1.41 and above: check if withComponent method exists
+			if ( method_exists( $sf, 'withComponent' ) ) {
+				return new self( $sf->withComponent( 'CrowdSec' ) );
 			}
 		}
-		return self::$instance;
+
+		// MW 1.40 and below: use null since there is no default instance
+		return new self( null );
 	}
 
 	/**
-	 * 결정 쿼리 카운트를 증가시킵니다.
+	 * Increment decision query count.
 	 * @param string $context 컨텍스트 (선택적)
+	 * @param string $action 액션 유형 (선택적)
 	 */
-	public function incrementDecisionQuery( string $context = '' ) {
+	public function incrementDecisionQuery( string $context = '', string $action = '' ) {
 		if ( $this->statsFactory === null ) {
 			return;
 		}
@@ -76,14 +72,18 @@ class StatsUtil {
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
 		}
+		if ( $action ) {
+			$counter->setLabel( 'action', $action );
+		}
 		$counter->increment();
 	}
 
 	/**
-	 * LAPI 오류 카운트를 증가시킵니다.
+	 * Increment LAPI error count.
 	 * @param string $context 컨텍스트 (선택적)
+	 * @param string $action 액션 유형 (선택적)
 	 */
-	public function incrementLAPIError( string $context = '' ) {
+	public function incrementLAPIError( string $context = '', string $action = '' ) {
 		if ( $this->statsFactory === null ) {
 			return;
 		}
@@ -91,15 +91,19 @@ class StatsUtil {
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
 		}
+		if ( $action ) {
+			$counter->setLabel( 'action', $action );
+		}
 		$counter->increment();
 	}
 
 	/**
-	 * 보고 전용 모드 트리거 카운트를 증가시킵니다.
-	 * @param string $type 결정 유형
-	 * @param string $context 컨텍스트 (선택적)
+	 * Increment report only mode trigger count.
+	 * @param string $type decision type
+	 * @param string $context context (optional)
+	 * @param string $action action type (optional)
 	 */
-	public function incrementReportOnly( string $type, string $context = '' ) {
+	public function incrementReportOnly( string $type, string $context = '', string $action = '' ) {
 		if ( $this->statsFactory === null ) {
 			return;
 		}
@@ -108,15 +112,19 @@ class StatsUtil {
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
 		}
+		if ( $action ) {
+			$counter->setLabel( 'action', $action );
+		}
 		$counter->increment();
 	}
 
 	/**
-	 * 차단 카운트를 증가시킵니다.
-	 * @param string $type 결정 유형
-	 * @param string $context 컨텍스트 (선택적)
+	 * Increment block count.
+	 * @param string $type decision type
+	 * @param string $context context (optional)
+	 * @param string $action action type (optional)
 	 */
-	public function incrementBlock( string $type, string $context = '' ) {
+	public function incrementBlock( string $type, string $context = '', string $action = '' ) {
 		if ( $this->statsFactory === null ) {
 			return;
 		}
@@ -124,6 +132,9 @@ class StatsUtil {
 			->setLabel( 'type', $type );
 		if ( $context ) {
 			$counter->setLabel( 'context', $context );
+		}
+		if ( $action ) {
+			$counter->setLabel( 'action', $action );
 		}
 		$counter->increment();
 	}

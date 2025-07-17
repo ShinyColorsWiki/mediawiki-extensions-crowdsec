@@ -47,6 +47,9 @@ class Hooks {
 	/** @var LAPIClient|null */
 	private $lapiClient;
 
+	/** @var MediaWiki\Extension\CrowdSec\StatsUtil */
+	private $statsUtil;
+
 	/**
 	 * Constructor of Hooks
 	 * @param MediaWiki\Config\Config $config main config
@@ -61,6 +64,7 @@ class Hooks {
 			$this->httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
 		}
 		$this->lapiClient = new LAPIClient( $config, $this->httpRequestFactory );
+		$this->statsUtil = StatsUtil::create();
 	}
 
 	// /**
@@ -158,10 +162,10 @@ class Hooks {
 
 		$lapiResult = $this->lapiClient->getDecision( $ip );
 
-		StatsUtil::singleton()->incrementDecisionQuery( 'permissions' );
+		$this->statsUtil->incrementDecisionQuery( 'permissions', $action );
 
 		if ( $lapiResult == false ) {
-			StatsUtil::singleton()->incrementLAPIError( 'permissions' );
+			$this->statsUtil->incrementLAPIError( 'permissions', $action );
 			$logger->info(
 				"{user} tripped CrowdSec List doing {action} "
 				. "by using {clientip} on \"{title}\". "
@@ -228,10 +232,10 @@ class Hooks {
 		);
 
 		if ( $this->config->get( 'CrowdSecReportOnly' ) ) {
-			StatsUtil::singleton()->incrementReportOnly( $lapiResult, 'permissions' );
+			$this->statsUtil->incrementReportOnly( $lapiResult, 'permissions', $action );
 			return true;
 		} else {
-			StatsUtil::singleton()->incrementBlock( $lapiResult, 'permissions' );
+			$this->statsUtil->incrementBlock( $lapiResult, 'permissions', $action );
 		}
 
 		// Set error and block
@@ -250,9 +254,9 @@ class Hooks {
 		}
 
 		$lapiType = $this->lapiClient->getDecision( $ip );
-		StatsUtil::singleton()->incrementDecisionQuery( 'blocklog' );
+			$this->statsUtil->incrementDecisionQuery( 'blocklog' );
 		if ( $lapiType === false ) {
-			StatsUtil::singleton()->incrementLAPIError( 'blocklog' );
+			$this->statsUtil->incrementLAPIError( 'blocklog' );
 		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
 			$msg[] = MWHtml::rawElement(
 				'span',
@@ -286,13 +290,17 @@ class Hooks {
 	 * @return bool
 	 */
 	private static function isExemptedFromAutoblocks( $ip ) {
-		// Mediawiki <= 1.41
-		if ( method_exists( DatabaseBlock::class, 'isExemptedFromAutoblocks' ) ) {
-			return DatabaseBlock::isExemptedFromAutoblocks( $ip );
+		// Mediawiki >= 1.42
+		$instance = MediaWikiServices::getInstance();
+		if ( method_exists( $instance, 'getAutoblockExemptionList' ) ) {
+			$autoblockExemptionList = $instance->getAutoblockExemptionList();
+			if ( method_exists( $autoblockExemptionList, 'isExempt' ) ) {
+				return $autoblockExemptionList->isExempt( $ip );
+			}
 		}
 
-		// Mediawiki >= 1.42
-		return MediaWikiServices::getInstance()->getAutoblockExemptionList()->isExempt( $ip );
+		// Mediawiki <= 1.41
+		return DatabaseBlock::isExemptedFromAutoblocks( $ip );
 	}
 
 	/**

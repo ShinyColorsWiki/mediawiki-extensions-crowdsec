@@ -19,8 +19,11 @@ class AbuseFilterHookHandler implements
 	/** @var MediaWiki\Http\HttpRequestFactory|null */
 	private $httpRequestFactory;
 
-	/** @var LAPIClient */
+	/** @var MediaWiki\Extension\CrowdSec\LAPIClient */
 	private $lapiClient;
+
+	/** @var MediaWiki\Extension\CrowdSec\StatsUtil */
+	private $statsUtil;
 
 	/**
 	 * Constructor of AbuseFilterHookHandler
@@ -35,6 +38,7 @@ class AbuseFilterHookHandler implements
 			$this->httpRequestFactory = $httpRequestFactory;
 		}
 		$this->lapiClient = new LAPIClient( $config, $this->httpRequestFactory );
+		$this->statsUtil = StatsUtil::create();
 	}
 
 	/**
@@ -66,9 +70,9 @@ class AbuseFilterHookHandler implements
 				$result = 'unknown';
 			} else {
 				$decision = $this->lapiClient->getDecision( $ip );
-				StatsUtil::singleton()->incrementDecisionQuery( 'abusefilter' );
+				$this->statsUtil->incrementDecisionQuery( 'abusefilter' );
 				if ( $decision === false ) {
-					StatsUtil::singleton()->incrementLAPIError( 'abusefilter' );
+					$this->statsUtil->incrementLAPIError( 'abusefilter' );
 					$result = 'error';
 				} else {
 					$result = $decision;
