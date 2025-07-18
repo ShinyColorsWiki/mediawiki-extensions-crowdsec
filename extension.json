@@ -1,9 +1,10 @@
 {
   "name": "CrowdSec",
+  "version": "0.20.0",
   "author": ["MPThLee"],
   "url": "https://www.mediawiki.org/wiki/Extension:CrowdSec",
   "descriptionmsg": "crowdsec-desc",
-  "license-name": "GPL-2.0+",
+  "license-name": "GPL-2.0-or-later",
   "type": "antispam",
   "requires": {
     "MediaWiki": ">= 1.39"

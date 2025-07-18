@@ -191,7 +191,11 @@ class Hooks {
 		}
 
 		$treatTypesAsBan = $this->config->get( 'CrowdSecTreatTypesAsBan' );
-		$isBlocked = ( $lapiResult != "ok" && in_array( $lapiResult, $treatTypesAsBan ) );
+		$isBlocked = ( $lapiResult != 'ok' && (
+			// ban is ban, other types are treated as ban if in $treatTypesAsBan
+			$lapiResult == 'ban' ||
+			in_array( $lapiResult, $treatTypesAsBan )
+		) );
 
 		if ( !$this->config->get( 'CrowdSecReportOnly' ) ) {
 			// Enforce mode: if not blocked or has exemptions, allow
@@ -257,7 +261,12 @@ class Hooks {
 			$this->statsUtil->incrementDecisionQuery( 'blocklog' );
 		if ( $lapiType === false ) {
 			$this->statsUtil->incrementLAPIError( 'blocklog' );
-		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != "ok" ) {
+		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiResult != 'ok' && (
+			// ban is ban, other types are treated as ban if in $treatTypesAsBan
+			$lapiResult == 'ban' ||
+			in_array( $lapiResult, $treatTypesAsBan )
+		) ) {
+
 			$msg[] = MWHtml::rawElement(
 				'span',
 				[ 'class' => 'mw-crowdsec-denylisted' ],
