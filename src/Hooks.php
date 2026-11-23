@@ -258,13 +258,13 @@ class Hooks {
 		}
 
 		$lapiType = $this->lapiClient->getDecision( $ip );
-			$this->statsUtil->incrementDecisionQuery( 'blocklog' );
+		$this->statsUtil->incrementDecisionQuery( 'blocklog' );
 		if ( $lapiType === false ) {
 			$this->statsUtil->incrementLAPIError( 'blocklog' );
-		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiResult != 'ok' && (
+		} elseif ( IPUtils::isIPAddress( $ip ) && $lapiType != 'ok' && (
 			// ban is ban, other types are treated as ban if in $treatTypesAsBan
-			$lapiResult == 'ban' ||
-			in_array( $lapiResult, $treatTypesAsBan )
+			$lapiType == 'ban' ||
+			in_array( $lapiType, $this->config->get( 'CrowdSecTreatTypesAsBan' ), true )
 		) ) {
 
 			$msg[] = MWHtml::rawElement(
@@ -318,7 +318,7 @@ class Hooks {
 	 * @param MediaWiki\User\User $user
 	 * @return bool|string IP address or false
 	 */
-	private static function getIPFromUser( $user ) {
+	public static function getIPFromUser( $user ) {
 		$context = MWRequestContext::getMain();
 		if ( $context->getUser()->getName() === $user->getName() ) {
 			// Only use the main context if the users are the same
