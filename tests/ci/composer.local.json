@@ -1,7 +1,8 @@
 {
   "extra": {
     "merge-plugin": {
-      "include": ["extensions/CrowdSec/composer.json"]
+      "include": ["extensions/AbuseFilter/composer.json"],
+      "merge-dev": false
     }
   }
 }

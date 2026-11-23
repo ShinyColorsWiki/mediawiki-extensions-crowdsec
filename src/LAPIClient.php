@@ -29,16 +29,22 @@ if ( class_exists( 'ObjectCache' ) && !class_exists( 'MediaWiki\\Cache\\ObjectCa
 }
 
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\RequestContext' ) ) {
+	// Legacy alias is guarded by class_exists; absent on newer MediaWiki.
+	// @phan-suppress-next-line PhanUndeclaredClassAliasOriginal
 	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
 }
 
 if ( class_exists( 'Status' ) && !class_exists( 'MediaWiki\\Status\\Status' ) ) {
+	// Legacy alias is guarded by class_exists; absent on newer MediaWiki.
+	// @phan-suppress-next-line PhanUndeclaredClassAliasOriginal
 	class_alias( 'Status', 'MediaWiki\\Status\\Status' );
 }
 
 // Due to MW 1.40, FormatJson is declared weird in global namespace.
 // So can't use FormatJson directly. need to alias it to our own namespace.
 if ( class_exists( 'FormatJson' ) ) {
+	// Legacy alias is guarded by class_exists; absent on newer MediaWiki.
+	// @phan-suppress-next-line PhanUndeclaredClassAliasOriginal
 	class_alias( 'FormatJson', 'MediaWiki\\Extension\\CrowdSec\\MWFormatJson' );
 } elseif ( class_exists( 'MediaWiki\\Json\\FormatJson' ) ) {
 	class_alias( 'MediaWiki\\Json\\FormatJson', 'MediaWiki\\Extension\\CrowdSec\\MWFormatJson' );
@@ -53,13 +59,13 @@ use MediaWiki\Status\Status as MWStatus;
 class LAPIClient {
 	/** @var mixed */
 	private $error = null;
-	/** @var MediaWiki\Cache\BagOStuff */
+	/** @var \Wikimedia\ObjectCache\BagOStuff */
 	private $cache;
-	/** @var Psr\Log\LoggerInterface */
+	/** @var \Psr\Log\LoggerInterface */
 	private $logger;
-	/** @var MediaWiki\Http\HttpRequestFactory */
+	/** @var \MediaWiki\Http\HttpRequestFactory */
 	private $httpRequestFactory;
-	/** @var MediaWiki\Config\Config|null */
+	/** @var \MediaWiki\Config\Config|null */
 	private $config;
 
 	/** @var LAPIClient|null */
@@ -67,8 +73,8 @@ class LAPIClient {
 
 	/**
 	 * Constructor of LAPIClient
-	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
+	 * @param \MediaWiki\Config\Config $config main config
+	 * @param \MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory ) {
 		$this->logger = LoggerFactory::getInstance( 'CrowdSecLocalAPI' );
@@ -89,7 +95,7 @@ class LAPIClient {
 	/**
 	 * get decision from cache and lapi
 	 * @param string $ip
-	 * @return string
+	 * @return string|false
 	 */
 	public function getDecision( string $ip ) {
 		$cacheEnabled = $this->config->get( 'CrowdSecCache' );
@@ -120,7 +126,7 @@ class LAPIClient {
 	/**
 	 * request decision to local api
 	 * @param string $ip
-	 * @return string
+	 * @return string|false
 	 */
 	private function requestDecision( string $ip ) {
 		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
@@ -139,7 +145,7 @@ class LAPIClient {
 			try {
 				// This will throw an exception if NullHttpRequestFactory is used.
 				$this->httpRequestFactory->create( $url, $options, __METHOD__ );
-			} catch ( \Exception $e ) {
+			} catch ( \Exception ) {
 				$this->logError( 'Invalid HttpRequestFactory instance during test, returning false early.' );
 				return false;
 			}

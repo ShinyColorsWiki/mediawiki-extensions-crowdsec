@@ -13,22 +13,22 @@ class AbuseFilterHookHandler implements
 	AbuseFilterComputeVariableHook,
 	AbuseFilterGenerateUserVarsHook
 {
-	/** @var MediaWiki\Config\Config|null */
+	/** @var \MediaWiki\Config\Config|null */
 	private $config;
 
-	/** @var MediaWiki\Http\HttpRequestFactory|null */
+	/** @var \MediaWiki\Http\HttpRequestFactory|null */
 	private $httpRequestFactory;
 
-	/** @var MediaWiki\Extension\CrowdSec\LAPIClient */
+	/** @var \MediaWiki\Extension\CrowdSec\LAPIClient */
 	private $lapiClient;
 
-	/** @var MediaWiki\Extension\CrowdSec\StatsUtil */
+	/** @var \MediaWiki\Extension\CrowdSec\StatsUtil */
 	private $statsUtil;
 
 	/**
 	 * Constructor of AbuseFilterHookHandler
-	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
+	 * @param \MediaWiki\Config\Config $config main config
+	 * @param \MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->config = $config;
@@ -49,8 +49,7 @@ class AbuseFilterHookHandler implements
 		$enabled = $this->config->get( 'CrowdSecEnable' );
 		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
 		$apiUrl = $this->config->get( 'CrowdSecAPIUrl' );
-		$localApi = ( isset( $apiKey ) && isset( $apiUrl ) )
-				&& !( empty( $apiKey ) || empty( $apiUrl ) );
+		$localApi = (bool)$apiKey && (bool)$apiUrl;
 		return $enabled && $localApi;
 	}
 
@@ -59,7 +58,7 @@ class AbuseFilterHookHandler implements
 	 * @param string $method
 	 * @param VariableHolder $vars
 	 * @param array $parameters
-	 * @param null &$result
+	 * @param string|null &$result
 	 * @return bool
 	 */
     // phpcs:ignore
@@ -86,8 +85,8 @@ class AbuseFilterHookHandler implements
 	/**
 	 * Load our blocked variable
 	 * @param VariableHolder $vars
-	 * @param MediaWiki\User\User $user
-	 * @param ?MediaWiki\RecentChanges\RecentChange $rc
+	 * @param \MediaWiki\User\User $user
+	 * @param \RecentChange|null $rc
 	 * @return bool
 	 */
     // phpcs:ignore

@@ -22,10 +22,14 @@ namespace MediaWiki\Extension\CrowdSec;
 
 // === Compatibility for MediaWiki 1.39 ===
 if ( class_exists( 'RequestContext' ) && !class_exists( 'MediaWiki\\Context\\RequestContext' ) ) {
+	// Legacy alias is guarded by class_exists; absent on newer MediaWiki.
+	// @phan-suppress-next-line PhanUndeclaredClassAliasOriginal
 	class_alias( 'RequestContext', 'MediaWiki\\Context\\RequestContext' );
 }
 
 if ( class_exists( 'Html' ) && !class_exists( 'MediaWiki\\Html\\Html' ) ) {
+	// Legacy alias is guarded by class_exists; absent on newer MediaWiki.
+	// @phan-suppress-next-line PhanUndeclaredClassAliasOriginal
 	class_alias( 'Html', 'MediaWiki\\Html\\Html' );
 }
 // === End of Compatibility for MediaWiki 1.39 ===
@@ -38,22 +42,22 @@ use MediaWiki\MediaWikiServices;
 use Wikimedia\IPUtils;
 
 class Hooks {
-	/** @var MediaWiki\Config\Config|null */
+	/** @var \MediaWiki\Config\Config|null */
 	private $config;
 
-	/** @var MediaWiki\Http\HttpRequestFactory|null */
+	/** @var \MediaWiki\Http\HttpRequestFactory|null */
 	private $httpRequestFactory;
 
 	/** @var LAPIClient|null */
 	private $lapiClient;
 
-	/** @var MediaWiki\Extension\CrowdSec\StatsUtil */
+	/** @var \MediaWiki\Extension\CrowdSec\StatsUtil */
 	private $statsUtil;
 
 	/**
 	 * Constructor of Hooks
-	 * @param MediaWiki\Config\Config $config main config
-	 * @param MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
+	 * @param \MediaWiki\Config\Config $config main config
+	 * @param \MediaWiki\Http\HttpRequestFactory|null $httpRequestFactory http request factory
 	 */
 	public function __construct( $config, $httpRequestFactory = null ) {
 		$this->config = $config;
@@ -73,8 +77,8 @@ class Hooks {
 	//  * If the user is blocked, return false.
 	//  * If the user is not blocked, return true.
 	//  *
-	//  * @param MediaWiki\Title\Title &$title Title being acted upon
-	//  * @param MediaWiki\User\User &$user User performing the action
+	//  * @param \MediaWiki\Title\Title &$title Title being acted upon
+	//  * @param \MediaWiki\User\User &$user User performing the action
 	//  * @param string $action Action being performed
 	//  * @param array &$result Will be filled with block status if blocked
 	//  * @return bool
@@ -88,8 +92,8 @@ class Hooks {
 	 * If the user is blocked, return false.
 	 * If the user is not blocked, return true.
 	 *
-	 * @param MediaWiki\Title\Title &$title Title being acted upon
-	 * @param MediaWiki\User\User &$user User performing the action
+	 * @param \MediaWiki\Title\Title &$title Title being acted upon
+	 * @param \MediaWiki\User\User &$user User performing the action
 	 * @param string $action Action being performed
 	 * @param array &$result Will be filled with block status if blocked
 	 * @return bool
@@ -105,8 +109,8 @@ class Hooks {
 	/**
 	 * If an IP address is denylisted, don't let them edit.
 	 *
-	 * @param MediaWiki\Title\Title &$title Title being acted upon
-	 * @param MediaWiki\User\User &$user User performing the action
+	 * @param \MediaWiki\Title\Title &$title Title being acted upon
+	 * @param \MediaWiki\User\User &$user User performing the action
 	 * @param string $action Action being performed
 	 * @param array &$result Will be filled with block status if blocked
 	 * @return bool
@@ -285,8 +289,7 @@ class Hooks {
 		$enabled = $this->config->get( 'CrowdSecEnable' );
 		$apiKey = $this->config->get( 'CrowdSecAPIKey' );
 		$apiUrl = $this->config->get( 'CrowdSecAPIUrl' );
-		$localApi = ( isset( $apiKey ) && isset( $apiUrl ) )
-				&& !( empty( $apiKey ) || empty( $apiUrl ) );
+		$localApi = (bool)$apiKey && (bool)$apiUrl;
 		return $enabled && $localApi;
 	}
 
@@ -315,7 +318,7 @@ class Hooks {
 	/**
 	 * Get an IP address for a User if possible
 	 *
-	 * @param MediaWiki\User\User $user
+	 * @param \MediaWiki\User\User $user
 	 * @return bool|string IP address or false
 	 */
 	public static function getIPFromUser( $user ) {

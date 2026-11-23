@@ -26,12 +26,12 @@ use MediaWiki\MediaWikiServices;
  * Stats utility class for CrowdSec extension.
  */
 class StatsUtil {
-	/** @var MediaWiki\Metrics\MetricsFactory */
+	/** @var \Wikimedia\Stats\StatsFactory|null */
 	private $statsFactory;
 
 	/**
 	 * private constructor.
-	 * @param MediaWiki\Metrics\MetricsFactory $statsFactory
+	 * @param \Wikimedia\Stats\StatsFactory|null $statsFactory
 	 */
 	private function __construct( $statsFactory ) {
 		$this->statsFactory = $statsFactory;
@@ -39,7 +39,7 @@ class StatsUtil {
 
 	/**
 	 * Create a new instance and return it (__construct's alias).
-	 * @param MediaWiki\MediaWikiServices|null $service MediaWikiServices Instance
+	 * @param \MediaWiki\MediaWikiServices|null $service MediaWikiServices Instance
 	 * @return StatsUtil
 	 */
 	public static function create( $service = null ): StatsUtil {

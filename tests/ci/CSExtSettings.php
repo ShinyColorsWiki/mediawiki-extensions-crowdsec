@@ -18,6 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+wfLoadExtension( 'AbuseFilter' );
 wfLoadExtension( 'CrowdSec' );
 $wgCrowdSecEnabled = true;
 $wgCrowdSecAPIKey = "TestKey1";

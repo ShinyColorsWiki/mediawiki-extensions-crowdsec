@@ -21,14 +21,14 @@ jobs:
         with:
           path: ~/.composer/cache
           key: composer-cache
-      - run: sudo apt-get install -y composer && composer install
+      - run: composer install --no-interaction
       - run: composer test
 
   # Phan (PHP static analyzer)
   phan:
     runs-on: ubuntu-latest
     env:
-      branch: master
+      branch: REL1_43
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -38,13 +38,12 @@ jobs:
           tools: composer
       - uses: actions/cache@v4
         with:
-          path: |
-            ~/.composer/cache
-            buildcache
-          key: buildcache-${{ env.branch }}
+          path: ~/.composer/cache
+          key: composer-phan-${{ hashFiles('composer.json') }}
       - uses: edwardspec/github-action-build-mediawiki@v1
         with:
           branch: ${{ env.branch }}
+          extensions: AbuseFilter
           noinstall: 1
       - name: Install dependencies
         run: |
@@ -54,36 +53,22 @@ jobs:
       - name: RUN -- phan
         run: cd mediawiki/extensions/CrowdSec && ./vendor/bin/phan --analyze-twice
 
-  # PHPUnit testsuite + Moto (mock server that emulates S3 API).
+  # PHPUnit against the deployed and upcoming LTS branches.
   phpunit:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.1, 8.2, 8.3, 8.4]
-        mw-branch:
-          # Updated at 2025-07-16
-          - REL1_39 # legacy LTS
-          - REL1_40
-          - REL1_41
-          - REL1_42 # legacy
-          - REL1_43 # release, LTS
-          - REL1_44 # beta
-          - master # alpha, future
-        exclude:
-          # PHP 8.4 is not supported on MediaWiki 1.39, 1.40, 1.41, 1.42
-          - php: 8.4
-            mw-branch: REL1_39
-          - php: 8.4
-            mw-branch: REL1_40
-          - php: 8.4
-            mw-branch: REL1_41
-          - php: 8.4
-            mw-branch: REL1_42
+        php: ['8.3', '8.4']
+        mw-branch: [REL1_43, REL1_47]
+        include:
+          - php: '8.1'
+            mw-branch: REL1_43
+          - php: '8.2'
+            mw-branch: REL1_43
     env:
       USE_MOCK: 1
       branch: ${{ matrix.mw-branch }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.php == '8.4' || matrix.mw-branch == 'master' || matrix.mw-branch == 'REL1_45' }}
     services:
       memcached:
         image: memcached:latest
@@ -91,7 +76,7 @@ jobs:
           - 11211:11211
         options: --health-cmd "timeout 5 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/11211'" --health-interval 10s --health-timeout 5s --health-retries 5
       mariadb:
-        image: mariadb:10
+        image: mariadb:10.11
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: 1
         ports:
@@ -104,10 +89,8 @@ jobs:
       # Setup cache
       - uses: actions/cache@v4
         with:
-          path: |
-            ~/.composer/cache
-            buildcache
-          key: buildcache-${{ env.branch }}-${{ hashFiles('**/no/files/need/to/invalidate/cache/for/now') }}
+          path: ~/.composer/cache
+          key: composer-${{ matrix.php }}-${{ env.branch }}-${{ hashFiles('composer.json') }}
 
       # Install CrowdSec
       - name: Install and run CrowdSec
@@ -128,6 +111,7 @@ jobs:
       - uses: edwardspec/github-action-build-mediawiki@v1
         with:
           branch: ${{ env.branch }}
+          extensions: AbuseFilter
           extraLocalSettings: tests/ci/CSExtSettings.php
       - name: Finalize the installation of MediaWiki
         run: |
